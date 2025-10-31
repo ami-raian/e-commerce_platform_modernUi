@@ -24,15 +24,15 @@ export default function OrderConfirmationPage() {
 
         <div>
           <h1 className="section-title mb-2">Order Confirmed</h1>
-          <p className="text-lg text-muted">Thank you for your purchase!</p>
+          <p className="text-lg text-muted-foreground">Thank you for your purchase!</p>
         </div>
 
         <div className="card bg-accent">
-          <p className="text-sm text-muted mb-2">Order Number</p>
+          <p className="text-sm text-muted-foreground mb-2">Order Number</p>
           <p className="text-2xl font-bold font-mono">{orderNumber}</p>
         </div>
 
-        <div className="space-y-3 text-muted">
+        <div className="space-y-3 text-muted-foreground">
           <p>We've sent a confirmation email to your inbox with order details and tracking information.</p>
           <p>Your order will be shipped within 2-3 business days.</p>
         </div>

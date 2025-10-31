@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { use, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Star, ShoppingCart } from "lucide-react"
 import { mockProducts } from "@/lib/mock-products"
 import { useCartStore } from "@/lib/cart-store"
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = mockProducts.find((p) => p._id === params.id)
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const product = mockProducts.find((p) => p._id === id)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
@@ -21,7 +22,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         </Link>
         <div className="text-center py-16">
           <h1 className="section-title mb-4">Product Not Found</h1>
-          <p className="text-muted mb-6">The product you're looking for doesn't exist.</p>
+          <p className="text-muted-foreground mb-6">The product you're looking for doesn't exist.</p>
           <Link href="/products" className="btn-primary inline-block">
             Continue Shopping
           </Link>
@@ -59,7 +60,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <div className="space-y-6">
           <div>
             <h1 className="text-4xl font-serif font-bold text-balance mb-4">{product.name}</h1>
-            <p className="text-xl text-muted">{product.description}</p>
+            <p className="text-xl text-muted-foreground">{product.description}</p>
           </div>
 
           {/* Rating */}
@@ -78,7 +79,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
           {/* Price */}
           <div className="space-y-2">
-            <p className="text-muted">Price</p>
+            <p className="text-muted-foreground">Price</p>
             <p className="text-4xl font-bold text-primary">${product.price.toFixed(2)}</p>
           </div>
 
@@ -126,11 +127,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           {/* Product Details */}
           <div className="border-t border-border pt-6 space-y-4">
             <div>
-              <p className="text-sm font-medium text-muted mb-2">Category</p>
+              <p className="text-sm font-medium text-muted-foreground mb-2">Category</p>
               <p className="capitalize font-semibold">{product.category}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted mb-2">SKU</p>
+              <p className="text-sm font-medium text-muted-foreground mb-2">SKU</p>
               <p className="font-mono text-sm">{product._id}</p>
             </div>
           </div>

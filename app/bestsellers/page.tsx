@@ -10,12 +10,12 @@ export default function BestsellersPage() {
       <div className="space-y-8">
         <div>
           <h1 className="section-title mb-2">Bestsellers</h1>
-          <p className="text-muted">Our most popular and highest-rated products</p>
+          <p className="text-muted-foreground">Our most popular and highest-rated products</p>
         </div>
 
         {bestsellers.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-lg text-muted mb-4">No bestsellers yet</p>
+            <p className="text-lg text-muted-foreground mb-4">No bestsellers yet</p>
             <Link href="/products" className="btn-primary inline-block">
               Shop All Products
             </Link>

@@ -101,20 +101,20 @@ export function Navbar() {
 
       {/* Search Modal */}
       {showSearch && (
-        <div className="border-t border-border p-4 bg-card">
-          <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="border-t border-border p-3 bg-card">
+          <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex gap-2">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
               autoFocus
-              className="flex-1 px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex-1 px-3 py-1.5 text-sm border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity">
               Search
             </button>
-            <button type="button" onClick={() => setShowSearch(false)} className="btn-secondary">
+            <button type="button" onClick={() => setShowSearch(false)} className="px-4 py-1.5 text-sm border-2 border-primary text-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors">
               Cancel
             </button>
           </form>

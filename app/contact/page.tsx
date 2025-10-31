@@ -41,7 +41,7 @@ export default function ContactPage() {
           <div className="card text-center">
             <MapPin className="w-8 h-8 text-primary mx-auto mb-3" />
             <h3 className="font-semibold mb-2">Address</h3>
-            <p className="text-muted">New York, USA</p>
+            <p className="text-muted-foreground">New York, USA</p>
           </div>
         </div>
 

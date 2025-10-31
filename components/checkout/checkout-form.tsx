@@ -139,7 +139,7 @@ export function CheckoutForm({ total }: CheckoutFormProps) {
           <StripeCheckout amount={total} customerEmail={formData.email} customerName={customerName} />
         ) : (
           <div className="p-4 bg-accent rounded-lg border border-border text-center">
-            <p className="text-muted">Please fill out all shipping information to proceed with payment</p>
+            <p className="text-muted-foreground">Please fill out all shipping information to proceed with payment</p>
           </div>
         )}
       </div>
