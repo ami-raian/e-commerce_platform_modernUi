@@ -49,11 +49,13 @@ export default function CategoriesPage() {
               className={`${category.color} rounded-lg p-8 h-full cursor-pointer hover:shadow-lg transition-shadow group`}
             >
               <div className="text-4xl mb-4">{category.icon}</div>
-              <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
+              <h3 className="text-xl font-semibold mb-2 text-gray-600">
+                {category.name}
+              </h3>
               <p className="text-sm text-gray-600 mb-4">
                 {category.description}
               </p>
-              <div className="flex items-center gap-2 text-primary font-semibold group-hover:gap-3 transition-all">
+              <div className="flex items-center gap-2 font-semibold group-hover:gap-3 transition-all text-gray-600">
                 Shop Now <ArrowRight size={18} />
               </div>
             </div>
