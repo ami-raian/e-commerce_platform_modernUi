@@ -20,6 +20,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const initialTheme = savedTheme || (prefersDark ? "dark" : "light")
     setTheme(initialTheme)
     document.documentElement.setAttribute("data-theme", initialTheme)
+    // Add/remove dark class for Tailwind dark mode
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
     setMounted(true)
   }, [])
 
@@ -28,6 +34,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme(newTheme)
     localStorage.setItem("theme", newTheme)
     document.documentElement.setAttribute("data-theme", newTheme)
+    // Add/remove dark class for Tailwind dark mode
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
   }
 
   return (

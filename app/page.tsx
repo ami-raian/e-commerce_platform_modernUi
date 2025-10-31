@@ -41,7 +41,7 @@ export default function HomePage() {
       >
         <motion.div className="space-y-6 max-w-2xl" variants={itemVariants}>
           <h1 className="section-title text-primary">Discover Premium Products</h1>
-          <p className="text-lg text-muted leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             Shop from our curated collection of premium products with smooth animations and modern design. Your shopping
             experience, elevated.
           </p>
@@ -96,7 +96,7 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <motion.section
-        className="container-xl py-16 md:py-24 bg-primary text-white rounded-lg mb-16"
+        className="container-xl py-16 md:py-24 bg-primary text-primary-foreground rounded-lg mb-16"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -109,7 +109,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/products"
-            className="inline-block bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-accent transition-colors"
+            className="inline-block bg-background text-foreground px-8 py-3 rounded-full font-semibold hover:bg-muted transition-colors"
           >
             Shop Now
           </Link>
