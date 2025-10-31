@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { use, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Star, ShoppingCart } from "lucide-react"
 import { mockProducts } from "@/lib/mock-products"
 import { useCartStore } from "@/lib/cart-store"
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = mockProducts.find((p) => p._id === params.id)
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const product = mockProducts.find((p) => p._id === id)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
