@@ -38,7 +38,6 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
-    "@stripe/js": "latest",
     "@stripe/react-stripe-js": "latest",
     "@stripe/stripe-js": "latest",
     "@vercel/analytics": "1.3.1",
@@ -65,8 +64,6 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "use-sync-external-store": "latest",
-    "vaul": "^0.9.9",
-    "your-icon-library": "latest",
     "zod": "3.25.76",
     "zustand": "latest"
   },
