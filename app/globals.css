@@ -173,10 +173,25 @@
   }
 
   .card {
-    @apply bg-background border border-border rounded-lg p-4 shadow-sm;
+    @apply bg-card text-card-foreground border border-border rounded-lg p-4 shadow-sm;
   }
 
   .section-title {
-    @apply text-4xl md:text-5xl font-serif font-bold text-balance;
+    @apply text-4xl md:text-5xl font-serif font-bold text-balance text-foreground;
+  }
+
+  /* Input styles for better visibility in both modes */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    @apply bg-background text-foreground;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-muted-foreground;
   }
 }
