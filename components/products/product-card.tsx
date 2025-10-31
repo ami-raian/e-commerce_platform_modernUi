@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Star, ShoppingCart } from "lucide-react"
 import { useCartStore } from "@/lib/cart-store"
+import { toast } from "sonner"
 
 interface ProductCardProps {
   id: string
@@ -23,6 +24,10 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
       price,
       quantity: 1,
       image,
+    })
+    toast.success(`${name} added to cart!`, {
+      description: `$${price.toFixed(2)} - Quantity: 1`,
+      duration: 2000,
     })
   }
 
@@ -50,7 +55,7 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
                 />
               ))}
             </div>
-            <span className="text-sm text-muted">({rating})</span>
+            <span className="text-sm text-muted-foreground">({rating})</span>
           </div>
 
           <div className="flex items-center justify-between mt-auto">
@@ -60,7 +65,8 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
                 e.preventDefault()
                 handleAddToCart()
               }}
-              className="p-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+              className="p-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+              aria-label="Add to cart"
             >
               <ShoppingCart size={18} />
             </button>

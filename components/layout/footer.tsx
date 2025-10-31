@@ -3,20 +3,20 @@ import { Mail, Phone, MapPin } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background border-t border-border mt-16">
+    <footer className="bg-muted text-muted-foreground border-t border-border mt-16">
       <div className="container-xl py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <h3 className="font-serif text-2xl font-bold mb-4">ShopHub</h3>
-            <p className="text-gray-300 text-sm">
+            <h3 className="font-serif text-2xl font-bold mb-4 text-foreground">ShopHub</h3>
+            <p className="text-sm">
               Premium e-commerce platform with smooth animations and modern design.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4">Shop</h4>
+            <h4 className="font-semibold mb-4 text-foreground">Shop</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/products" className="hover:text-primary transition-colors">
@@ -38,7 +38,7 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
+            <h4 className="font-semibold mb-4 text-foreground">Company</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/about" className="hover:text-primary transition-colors">
@@ -60,7 +60,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
+            <h4 className="font-semibold mb-4 text-foreground">Contact</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2">
                 <Mail size={16} />
@@ -83,7 +83,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
           <p>&copy; 2025 ShopHub. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <Link href="/privacy" className="hover:text-primary transition-colors">

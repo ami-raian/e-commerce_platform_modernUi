@@ -16,8 +16,8 @@ export function Navbar() {
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const { theme, toggleTheme } = useTheme()
-  const getItemCount = useCartStore((state) => state.getItemCount)
-  const cartCount = getItemCount()
+  const items = useCartStore((state) => state.items)
+  const cartCount = items.reduce((total, item) => total + item.quantity, 0)
   const user = useAuthStore((state) => state.user)
 
   const handleSearch = (e: React.FormEvent) => {
