@@ -1,55 +1,57 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Tag, Check, X } from "lucide-react"
-import { mockPromoCodes } from "@/lib/mock-promos"
-import { usePromoStore } from "@/lib/promo-store"
+import { useState } from "react";
+import { Tag, Check, X } from "lucide-react";
+import { mockPromoCodes } from "@/lib/mock-promos";
+import { usePromoStore } from "@/lib/promo-store";
 
 interface PromoInputProps {
-  onApply?: () => void
+  onApply?: () => void;
 }
 
 export function PromoInput({ onApply }: PromoInputProps) {
-  const [code, setCode] = useState("")
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
-  const appliedCode = usePromoStore((state) => state.appliedCode)
-  const setPromoCode = usePromoStore((state) => state.setPromoCode)
-  const removePromoCode = usePromoStore((state) => state.removePromoCode)
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const appliedCode = usePromoStore((state) => state.appliedCode);
+  const setPromoCode = usePromoStore((state) => state.setPromoCode);
+  const removePromoCode = usePromoStore((state) => state.removePromoCode);
 
   const handleApply = () => {
-    setError("")
-    setSuccess(false)
+    setError("");
+    setSuccess(false);
 
     if (!code.trim()) {
-      setError("Please enter a promo code")
-      return
+      setError("Please enter a promo code");
+      return;
     }
 
-    const promo = mockPromoCodes.find((p) => p.code.toUpperCase() === code.toUpperCase())
+    const promo = mockPromoCodes.find(
+      (p) => p.code.toUpperCase() === code.toUpperCase()
+    );
 
     if (!promo) {
-      setError("Invalid promo code")
-      return
+      setError("Invalid promo code");
+      return;
     }
 
     if (new Date() > promo.expiresAt) {
-      setError("This promo code has expired")
-      return
+      setError("This promo code has expired");
+      return;
     }
 
     if (promo.maxUses && promo.usedCount >= promo.maxUses) {
-      setError("This promo code has reached its usage limit")
-      return
+      setError("This promo code has reached its usage limit");
+      return;
     }
 
-    setPromoCode(promo.code, promo.discount, promo.discountType)
-    setSuccess(true)
-    setCode("")
-    onApply?.()
+    setPromoCode(promo.code, promo.discount, promo.discountType);
+    setSuccess(true);
+    setCode("");
+    onApply?.();
 
-    setTimeout(() => setSuccess(false), 3000)
-  }
+    setTimeout(() => setSuccess(false), 3000);
+  };
 
   return (
     <div className="card">
@@ -62,9 +64,14 @@ export function PromoInput({ onApply }: PromoInputProps) {
         <div className="flex items-center justify-between p-3 bg-green-50 border border-success rounded-lg mb-4">
           <div className="flex items-center gap-2">
             <Check size={18} className="text-success" />
-            <span className="text-sm font-medium">Code applied: {appliedCode}</span>
+            <span className="text-sm font-medium">
+              Code applied: {appliedCode}
+            </span>
           </div>
-          <button onClick={() => removePromoCode()} className="p-1 hover:bg-white rounded transition-colors">
+          <button
+            onClick={() => removePromoCode()}
+            className="p-1 hover:bg-white rounded transition-colors"
+          >
             <X size={16} className="text-muted-foreground" />
           </button>
         </div>
@@ -81,16 +88,20 @@ export function PromoInput({ onApply }: PromoInputProps) {
             />
             <button
               onClick={handleApply}
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-medium text-sm"
             >
               Apply
             </button>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
-          {success && <p className="text-sm text-success">Promo code applied successfully!</p>}
+          {success && (
+            <p className="text-sm text-success">
+              Promo code applied successfully!
+            </p>
+          )}
         </>
       )}
     </div>
-  )
+  );
 }
