@@ -62,7 +62,7 @@ export default function RegisterPage() {
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-3xl font-serif font-bold mb-2 text-primary">Create Account</h1>
-        <p className="text-muted mb-6">Sign up to start shopping</p>
+        <p className="text-muted-foreground mb-6">Sign up to start shopping</p>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
@@ -128,7 +128,7 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-muted">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link href="/login" className="text-primary hover:underline font-medium">
             Sign in

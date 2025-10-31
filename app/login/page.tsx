@@ -40,7 +40,7 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-3xl font-serif font-bold mb-2 text-primary">Welcome Back</h1>
-        <p className="text-muted mb-6">Sign in to your account</p>
+        <p className="text-muted-foreground mb-6">Sign in to your account</p>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-muted">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
           <Link href="/register" className="text-primary hover:underline font-medium">
             Create one

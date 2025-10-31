@@ -65,7 +65,7 @@ export function PromoInput({ onApply }: PromoInputProps) {
             <span className="text-sm font-medium">Code applied: {appliedCode}</span>
           </div>
           <button onClick={() => removePromoCode()} className="p-1 hover:bg-white rounded transition-colors">
-            <X size={16} className="text-muted" />
+            <X size={16} className="text-muted-foreground" />
           </button>
         </div>
       ) : (
@@ -77,7 +77,7 @@ export function PromoInput({ onApply }: PromoInputProps) {
               onChange={(e) => setCode(e.target.value)}
               placeholder="Enter promo code"
               onKeyPress={(e) => e.key === "Enter" && handleApply()}
-              className="flex-1 px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex-1 px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button
               onClick={handleApply}

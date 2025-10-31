@@ -63,7 +63,7 @@ export default function UserDashboard() {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-4xl font-serif font-bold text-primary">Dashboard</h1>
-              <p className="text-muted mt-2">Welcome, {user.name}</p>
+              <p className="text-muted-foreground mt-2">Welcome, {user.name}</p>
             </div>
             <div className="flex gap-2">
               {isAdmin && (
@@ -91,7 +91,7 @@ export default function UserDashboard() {
                   <ShoppingBag size={24} />
                 </div>
                 <div>
-                  <p className="text-muted text-sm">Total Orders</p>
+                  <p className="text-muted-foreground text-sm">Total Orders</p>
                   <p className="text-2xl font-bold">{orders.length}</p>
                 </div>
               </div>
@@ -108,7 +108,7 @@ export default function UserDashboard() {
                   <ShoppingBag size={24} />
                 </div>
                 <div>
-                  <p className="text-muted text-sm">Cart Items</p>
+                  <p className="text-muted-foreground text-sm">Cart Items</p>
                   <p className="text-2xl font-bold">{cartItems.length}</p>
                 </div>
               </div>
@@ -125,7 +125,7 @@ export default function UserDashboard() {
                   <User size={24} />
                 </div>
                 <div>
-                  <p className="text-muted text-sm">Account Type</p>
+                  <p className="text-muted-foreground text-sm">Account Type</p>
                   <p className="text-2xl font-bold capitalize">{user.role}</p>
                 </div>
               </div>
@@ -142,19 +142,19 @@ export default function UserDashboard() {
             <h2 className="text-2xl font-serif font-bold mb-4">Profile Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-muted text-sm">Full Name</p>
+                <p className="text-muted-foreground text-sm">Full Name</p>
                 <p className="text-lg font-medium">{user.name}</p>
               </div>
               <div>
-                <p className="text-muted text-sm">Email</p>
+                <p className="text-muted-foreground text-sm">Email</p>
                 <p className="text-lg font-medium">{user.email}</p>
               </div>
               <div>
-                <p className="text-muted text-sm">Member Since</p>
+                <p className="text-muted-foreground text-sm">Member Since</p>
                 <p className="text-lg font-medium">{new Date(user.createdAt).toLocaleDateString()}</p>
               </div>
               <div>
-                <p className="text-muted text-sm">Account Status</p>
+                <p className="text-muted-foreground text-sm">Account Status</p>
                 <p className="text-lg font-medium text-green-600">Active</p>
               </div>
             </div>
@@ -206,7 +206,7 @@ export default function UserDashboard() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-muted">
+                      <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
                         No orders yet.{" "}
                         <Link href="/products" className="text-primary hover:underline">
                           Start shopping

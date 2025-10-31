@@ -81,7 +81,7 @@ export function PaymentForm({ amount, onSuccess }: PaymentFormProps) {
         {isProcessing ? "Processing..." : `Complete Payment - $${amount.toFixed(2)}`}
       </button>
 
-      <p className="text-xs text-center text-muted">
+      <p className="text-xs text-center text-muted-foreground">
         Your payment information is secure and encrypted. You will not be charged until you click "Complete Payment".
       </p>
     </form>

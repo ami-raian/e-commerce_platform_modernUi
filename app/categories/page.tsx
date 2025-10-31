@@ -38,7 +38,7 @@ export default function CategoriesPage() {
   return (
     <div className="container-xl py-16">
       <h1 className="section-title mb-4">Shop by Category</h1>
-      <p className="text-lg text-muted mb-12">
+      <p className="text-lg text-muted-foreground mb-12">
         Browse our collection by category
       </p>
 

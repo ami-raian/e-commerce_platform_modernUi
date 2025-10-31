@@ -25,7 +25,7 @@ export default function CheckoutPage() {
     return (
       <div className="container-xl py-8">
         <div className="text-center py-16">
-          <p className="text-lg text-muted mb-4">Your cart is empty</p>
+          <p className="text-lg text-muted-foreground mb-4">Your cart is empty</p>
           <Link href="/products" className="btn-primary inline-block">
             Continue Shopping
           </Link>
@@ -64,7 +64,7 @@ export default function CheckoutPage() {
           <div className="space-y-3 mb-6 pb-6 border-b border-border max-h-48 overflow-y-auto">
             {items.map((item) => (
               <div key={item.productId} className="flex justify-between">
-                <span className="text-muted">
+                <span className="text-muted-foreground">
                   {item.name} x{item.quantity}
                 </span>
                 <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
@@ -74,24 +74,24 @@ export default function CheckoutPage() {
 
           <div className="space-y-4 mb-6 pb-6 border-b border-border">
             <div className="flex justify-between">
-              <span className="text-muted">Subtotal</span>
+              <span className="text-muted-foreground">Subtotal</span>
               <span className="font-medium">${subtotal.toFixed(2)}</span>
             </div>
 
             {appliedCode && promoDiscount > 0 && (
               <div className="flex justify-between text-success">
-                <span className="text-muted">Discount ({appliedCode})</span>
+                <span className="text-muted-foreground">Discount ({appliedCode})</span>
                 <span className="font-medium">-${promoDiscount.toFixed(2)}</span>
               </div>
             )}
 
             <div className="flex justify-between">
-              <span className="text-muted">Tax</span>
+              <span className="text-muted-foreground">Tax</span>
               <span className="font-medium">${tax.toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-muted">Shipping</span>
+              <span className="text-muted-foreground">Shipping</span>
               <span className="font-medium">{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
             </div>
           </div>

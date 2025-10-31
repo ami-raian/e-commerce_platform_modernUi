@@ -59,7 +59,7 @@ export default function SearchPage() {
           {/* Search Title */}
           <div className="mb-8">
             <h1 className="text-4xl font-serif font-bold mb-2">Search Results</h1>
-            <p className="text-muted">
+            <p className="text-muted-foreground">
               {query ? (
                 <>
                   Found <span className="font-semibold text-foreground">{results.length}</span> products for "
@@ -74,7 +74,7 @@ export default function SearchPage() {
           {/* Results */}
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-muted">Searching...</p>
+              <p className="text-muted-foreground">Searching...</p>
             </div>
           ) : results.length > 0 ? (
             <motion.div
@@ -98,15 +98,15 @@ export default function SearchPage() {
             </motion.div>
           ) : query.trim() ? (
             <motion.div className="text-center py-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-xl text-muted mb-4">No products found for "{query}"</p>
-              <p className="text-muted mb-6">Try a different search term or browse all products</p>
+              <p className="text-xl text-muted-foreground mb-4">No products found for "{query}"</p>
+              <p className="text-muted-foreground mb-6">Try a different search term or browse all products</p>
               <Link href="/products" className="btn-primary inline-block">
                 Browse All Products
               </Link>
             </motion.div>
           ) : (
             <motion.div className="text-center py-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-muted mb-6">Enter a search term to find products</p>
+              <p className="text-muted-foreground mb-6">Enter a search term to find products</p>
               <Link href="/products" className="btn-primary inline-block">
                 Browse All Products
               </Link>
