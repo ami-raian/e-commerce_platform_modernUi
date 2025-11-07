@@ -1,3 +1,5 @@
+import { sub } from "date-fns";
+
 export const mockProducts = [
   // Gents Products
   {
@@ -21,6 +23,7 @@ export const mockProducts = [
     price: 3499,
     image: "/mens-formal-shirt.jpg",
     category: "fashion",
+    subCategory: "gents",
     gender: "gents",
     stock: 40,
     rating: 4.6,
@@ -49,6 +52,7 @@ export const mockProducts = [
     price: 5499,
     image: "/mens-sneakers.jpg",
     category: "fashion",
+    subCategory: "gents",
     gender: "gents",
     stock: 35,
     rating: 4.7,
@@ -77,6 +81,7 @@ export const mockProducts = [
     price: 4999,
     image: "/mens-jeans.jpg",
     category: "fashion",
+    subCategory: "gents",
     gender: "gents",
     stock: 50,
     rating: 4.6,
@@ -91,6 +96,7 @@ export const mockProducts = [
     price: 6999,
     image: "/running-shoes.jpg",
     category: "fashion",
+    subCategory: "gents",
     gender: "gents",
     stock: 40,
     rating: 4.8,
@@ -105,6 +111,7 @@ export const mockProducts = [
     price: 1999,
     image: "/polo-tshirt.jpg",
     category: "fashion",
+    subCategory: "gents",
     gender: "gents",
     stock: 60,
     rating: 4.5,
@@ -147,6 +154,7 @@ export const mockProducts = [
     price: 8999,
     image: "/winter-jacket.jpg",
     category: "fashion",
+    subCategory: "gents",
     gender: "gents",
     stock: 30,
     rating: 4.9,
@@ -191,6 +199,7 @@ export const mockProducts = [
     price: 9899,
     image: "/silk-scarf.jpg",
     category: "fashion",
+    subCategory: "ladies",
     gender: "ladies",
     stock: 30,
     rating: 4.8,
@@ -219,6 +228,7 @@ export const mockProducts = [
     price: 15999,
     image: "/designer-handbag.jpg",
     category: "fashion",
+    subCategory: "ladies",
     gender: "ladies",
     stock: 25,
     rating: 4.9,
@@ -247,6 +257,7 @@ export const mockProducts = [
     price: 4299,
     image: "/ethnic-kurti.jpg",
     category: "fashion",
+    subCategory: "ladies",
     gender: "ladies",
     stock: 45,
     rating: 4.7,
@@ -261,6 +272,7 @@ export const mockProducts = [
     price: 7999,
     image: "/womens-saree.jpg",
     category: "fashion",
+    subCategory: "ladies",
     gender: "ladies",
     stock: 35,
     rating: 4.8,
@@ -275,6 +287,7 @@ export const mockProducts = [
     price: 3499,
     image: "/ladies-sandals.jpg",
     category: "fashion",
+    subCategory: "ladies",
     gender: "ladies",
     stock: 50,
     rating: 4.6,
@@ -345,6 +358,7 @@ export const mockProducts = [
     price: 5499,
     image: "/salwar-kameez.jpg",
     category: "fashion",
+    subCategory: "ladies",
     gender: "ladies",
     stock: 40,
     rating: 4.7,
@@ -424,4 +438,4 @@ export const mockProducts = [
     isFlashSale: false,
     discount: 0,
   },
-]
+];
