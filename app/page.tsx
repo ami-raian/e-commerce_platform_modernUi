@@ -118,7 +118,9 @@ export default function HomePage() {
               <Truck size={32} className="text-primary" />
             </div>
             <h3 className="font-semibold text-lg">Free Shipping</h3>
-            <p className="text-sm text-muted-foreground">On orders over ৳5,000</p>
+            <p className="text-sm text-muted-foreground">
+              On orders over ৳5,000
+            </p>
           </div>
 
           <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-xl hover:bg-accent/50 transition-colors">
@@ -214,8 +216,8 @@ export default function HomePage() {
               Get 20% Off Your First Order
             </h2>
             <p className="text-xl opacity-90 max-w-2xl mx-auto">
-              Join thousands of happy customers across Bangladesh and experience premium shopping
-              today. Use code{" "}
+              Join thousands of happy customers across Bangladesh and experience
+              premium shopping today. Use code{" "}
               <span className="font-bold bg-white/20 px-3 py-1 rounded-lg">
                 WELCOME20
               </span>{" "}

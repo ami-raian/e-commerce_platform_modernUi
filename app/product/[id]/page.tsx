@@ -11,7 +11,36 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const product = mockProducts.find((p) => p._id === id)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [promoCode, setPromoCode] = useState("")
+  const [discount, setDiscount] = useState(0)
+  const [promoMessage, setPromoMessage] = useState("")
   const addItem = useCartStore((state) => state.addItem)
+
+  const promoCodes: { [key: string]: number } = {
+    "SAVE5": 5,
+    "SAVE10": 10,
+    "SAVE15": 15,
+    "WELCOME20": 20,
+  }
+
+  const applyPromoCode = () => {
+    const code = promoCode.toUpperCase()
+    if (promoCodes[code]) {
+      setDiscount(promoCodes[code])
+      setPromoMessage(`Promo code applied! ${promoCodes[code]}% discount`)
+    } else {
+      setDiscount(0)
+      setPromoMessage("Invalid promo code")
+    }
+    setTimeout(() => setPromoMessage(""), 3000)
+  }
+
+  const calculateFinalPrice = () => {
+    if (discount > 0) {
+      return product.price - (product.price * discount) / 100
+    }
+    return product.price
+  }
 
   if (!product) {
     return (
@@ -80,7 +109,49 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           {/* Price */}
           <div className="space-y-2">
             <p className="text-muted-foreground">Price</p>
-            <p className="text-4xl font-bold text-primary">৳{product.price.toLocaleString('en-BD')}</p>
+            {discount > 0 ? (
+              <div className="space-y-2">
+                <p className="text-2xl text-muted-foreground line-through">৳{product.price.toLocaleString('en-BD')}</p>
+                <p className="text-4xl font-bold text-primary">৳{calculateFinalPrice().toLocaleString('en-BD')}</p>
+                <p className="text-green-600 font-semibold">You save: ৳{(product.price - calculateFinalPrice()).toLocaleString('en-BD')} ({discount}% off)</p>
+              </div>
+            ) : (
+              <p className="text-4xl font-bold text-primary">৳{product.price.toLocaleString('en-BD')}</p>
+            )}
+          </div>
+
+          {/* Promo Code Section */}
+          <div className="bg-accent/50 border border-border rounded-lg p-4 space-y-3">
+            <p className="font-semibold">Have a Promo Code?</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                placeholder="Enter promo code"
+                className="flex-1 px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                onClick={applyPromoCode}
+                className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity"
+              >
+                Apply
+              </button>
+            </div>
+            {promoMessage && (
+              <p className={`text-sm font-medium ${promoMessage.includes("Invalid") ? "text-red-500" : "text-green-600"}`}>
+                {promoMessage}
+              </p>
+            )}
+            <div className="pt-2 space-y-1">
+              <p className="text-xs text-muted-foreground">Available promo codes:</p>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">SAVE5</span>
+                <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">SAVE10</span>
+                <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">SAVE15</span>
+                <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">WELCOME20</span>
+              </div>
+            </div>
           </div>
 
           {/* Stock Status */}
