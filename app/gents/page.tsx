@@ -27,7 +27,8 @@ export default function GentsPage() {
             </span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover our exclusive collection of men's fashion, accessories, and electronics
+            Discover our exclusive collection of men's fashion, accessories, and
+            electronics
           </p>
         </div>
 
@@ -40,7 +41,9 @@ export default function GentsPage() {
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground">No products found in this category</p>
+            <p className="text-lg text-muted-foreground">
+              No products found in this category
+            </p>
           </div>
         )}
       </div>
