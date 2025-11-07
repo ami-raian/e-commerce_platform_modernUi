@@ -241,7 +241,7 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4 capitalize">
                         {product.category}
                       </td>
-                      <td className="px-6 py-4">${product.price.toFixed(2)}</td>
+                      <td className="px-6 py-4">৳{product.price.toLocaleString('en-BD')}</td>
                       <td className="px-6 py-4">
                         {product.rating.toFixed(1)}★
                       </td>

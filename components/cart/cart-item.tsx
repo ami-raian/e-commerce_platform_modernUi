@@ -18,7 +18,7 @@ export function CartItemComponent({ item, onUpdateQuantity, onRemove }: CartItem
 
       <div className="flex-1">
         <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
-        <p className="text-primary font-bold">${item.price.toFixed(2)}</p>
+        <p className="text-primary font-bold">৳{item.price.toLocaleString('en-BD')}</p>
       </div>
 
       <div className="flex flex-col items-end gap-4">

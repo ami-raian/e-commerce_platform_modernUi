@@ -26,7 +26,7 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
       image,
     })
     toast.success(`${name} added to cart!`, {
-      description: `$${price.toFixed(2)} - Quantity: 1`,
+      description: `৳${price.toLocaleString('en-BD')} - Quantity: 1`,
       duration: 2000,
     })
   }
@@ -59,7 +59,7 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
           </div>
 
           <div className="flex items-center justify-between mt-auto">
-            <span className="text-primary font-bold text-lg">${price.toFixed(2)}</span>
+            <span className="text-primary font-bold text-lg">৳{price.toLocaleString('en-BD')}</span>
             <button
               onClick={(e) => {
                 e.preventDefault()

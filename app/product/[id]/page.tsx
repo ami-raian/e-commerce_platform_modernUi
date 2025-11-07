@@ -80,7 +80,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           {/* Price */}
           <div className="space-y-2">
             <p className="text-muted-foreground">Price</p>
-            <p className="text-4xl font-bold text-primary">${product.price.toFixed(2)}</p>
+            <p className="text-4xl font-bold text-primary">৳{product.price.toLocaleString('en-BD')}</p>
           </div>
 
           {/* Stock Status */}

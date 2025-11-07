@@ -15,9 +15,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "ShopHub - Premium E-Commerce",
+  title: "ShopHub - Premium E-Commerce Bangladesh",
   description:
-    "Discover premium products with smooth animations and modern design",
+    "Discover premium products in Bangladesh with smooth shopping experience and modern design. Cash on Delivery available.",
   generator: "v0.app",
 };
 

@@ -189,7 +189,7 @@ export default function UserDashboard() {
                         <td className="px-6 py-4">{order.date}</td>
                         <td className="px-6 py-4">{order.items}</td>
                         <td className="px-6 py-4 font-semibold">
-                          ${order.total.toFixed(2)}
+                          ৳{order.total.toLocaleString('en-BD')}
                         </td>
                         <td className="px-6 py-4">
                           <span

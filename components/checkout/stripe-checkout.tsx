@@ -46,7 +46,7 @@ export function StripeCheckout({ amount, customerEmail, customerName, onSuccess 
   if (!clientSecret) {
     return (
       <button onClick={createPaymentIntent} disabled={isLoading} className="w-full btn-primary py-3 text-lg">
-        {isLoading ? "Initializing..." : `Pay with Card - $${amount.toFixed(2)}`}
+        {isLoading ? "Initializing..." : `Pay with Card - ৳${amount.toLocaleString('en-BD')}`}
       </button>
     )
   }

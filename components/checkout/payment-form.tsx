@@ -78,7 +78,7 @@ export function PaymentForm({ amount, onSuccess }: PaymentFormProps) {
         className="w-full btn-primary py-3 text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isProcessing && <Loader2 size={20} className="animate-spin" />}
-        {isProcessing ? "Processing..." : `Complete Payment - $${amount.toFixed(2)}`}
+        {isProcessing ? "Processing..." : `Complete Payment - ৳${amount.toLocaleString('en-BD')}`}
       </button>
 
       <p className="text-xs text-center text-muted-foreground">
