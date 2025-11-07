@@ -6,7 +6,6 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/auth-store"
 import { useProductStore, type Product } from "@/lib/product-store"
-import { motion } from "framer-motion"
 import { Trash2, Edit2, Plus } from "lucide-react"
 
 export default function AdminDashboard() {
@@ -79,7 +78,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container-xl">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div>
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-serif font-bold text-primary">Admin Dashboard</h1>
             <button
@@ -104,11 +103,7 @@ export default function AdminDashboard() {
 
           {/* Product Form */}
           {showForm && (
-            <motion.div
-              className="bg-card border border-border rounded-lg p-6 mb-8"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-            >
+            <div className="bg-card border border-border rounded-lg p-6 mb-8">
               <h2 className="text-2xl font-serif font-bold mb-4">{editingId ? "Edit Product" : "Add New Product"}</h2>
               <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -187,11 +182,11 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               </form>
-            </motion.div>
+            </div>
           )}
 
           {/* Products Table */}
-          <motion.div className="bg-card border border-border rounded-lg overflow-hidden">
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-primary text-primary-foreground">
@@ -204,13 +199,10 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product, index) => (
-                    <motion.tr
+                  {products.map((product) => (
+                    <tr
                       key={product._id}
                       className="border-t border-border hover:bg-accent transition-colors"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
                     >
                       <td className="px-6 py-4">{product.name}</td>
                       <td className="px-6 py-4 capitalize">{product.category}</td>
@@ -230,17 +222,17 @@ export default function AdminDashboard() {
                           <Trash2 size={18} />
                         </button>
                       </td>
-                    </motion.tr>
+                    </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </motion.div>
+          </div>
 
           <div className="mt-6 p-4 bg-accent rounded-lg">
             <p className="text-sm">Total Products: {products.length}</p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )
