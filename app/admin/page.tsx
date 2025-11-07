@@ -1,24 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuthStore } from "@/lib/auth-store"
-import { useProductStore, type Product } from "@/lib/product-store"
-import { motion } from "framer-motion"
-import { Trash2, Edit2, Plus } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/auth-store";
+import { useProductStore, type Product } from "@/lib/product-store";
+import { Trash2, Edit2, Plus } from "lucide-react";
 
 export default function AdminDashboard() {
-  const router = useRouter()
-  const user = useAuthStore((state) => state.user)
-  const products = useProductStore((state) => state.products)
-  const deleteProduct = useProductStore((state) => state.deleteProduct)
-  const addProduct = useProductStore((state) => state.addProduct)
-  const updateProduct = useProductStore((state) => state.updateProduct)
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const products = useProductStore((state) => state.products);
+  const deleteProduct = useProductStore((state) => state.deleteProduct);
+  const addProduct = useProductStore((state) => state.addProduct);
+  const updateProduct = useProductStore((state) => state.updateProduct);
 
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     price: 0,
@@ -26,21 +25,21 @@ export default function AdminDashboard() {
     description: "",
     image: "/diverse-products-still-life.png",
     rating: 4.5,
-  })
+  });
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [user, router])
+  }, [user, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (editingId) {
-      updateProduct(editingId, formData)
-      setEditingId(null)
+      updateProduct(editingId, formData);
+      setEditingId(null);
     } else {
-      addProduct({ ...formData, _id: "" })
+      addProduct(formData as Omit<Product, "_id">);
     }
     setFormData({
       name: "",
@@ -49,9 +48,9 @@ export default function AdminDashboard() {
       description: "",
       image: "/diverse-products-still-life.png",
       rating: 4.5,
-    })
-    setShowForm(false)
-  }
+    });
+    setShowForm(false);
+  };
 
   const handleEdit = (product: Product) => {
     setFormData({
@@ -61,31 +60,33 @@ export default function AdminDashboard() {
       description: product.description || "",
       image: product.image,
       rating: product.rating,
-    })
-    setEditingId(product._id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(product._id);
+    setShowForm(true);
+  };
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      deleteProduct(id)
+      deleteProduct(id);
     }
-  }
+  };
 
   if (!user || user.role !== "admin") {
-    return null
+    return null;
   }
 
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container-xl">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div>
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-serif font-bold text-primary">Admin Dashboard</h1>
+            <h1 className="text-4xl font-serif font-bold text-primary">
+              Admin Dashboard
+            </h1>
             <button
               onClick={() => {
-                setShowForm(!showForm)
-                setEditingId(null)
+                setShowForm(!showForm);
+                setEditingId(null);
                 setFormData({
                   name: "",
                   price: 0,
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
                   description: "",
                   image: "/diverse-products-still-life.png",
                   rating: 4.5,
-                })
+                });
               }}
               className="btn-primary flex items-center gap-2"
             >
@@ -104,41 +105,57 @@ export default function AdminDashboard() {
 
           {/* Product Form */}
           {showForm && (
-            <motion.div
-              className="bg-card border border-border rounded-lg p-6 mb-8"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-            >
-              <h2 className="text-2xl font-serif font-bold mb-4">{editingId ? "Edit Product" : "Add New Product"}</h2>
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-card border border-border rounded-lg p-6 mb-8">
+              <h2 className="text-2xl font-serif font-bold mb-4">
+                {editingId ? "Edit Product" : "Add New Product"}
+              </h2>
+              <form
+                onSubmit={handleSubmit}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
                 <div>
-                  <label className="block text-sm font-medium mb-2">Product Name</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Product Name
+                  </label>
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Price</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Price
+                  </label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: Number.parseFloat(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        price: Number.parseFloat(e.target.value),
+                      })
+                    }
                     required
                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Category
+                  </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option>electronics</option>
@@ -149,23 +166,34 @@ export default function AdminDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Rating</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Rating
+                  </label>
                   <input
                     type="number"
                     step="0.1"
                     min="0"
                     max="5"
                     value={formData.rating}
-                    onChange={(e) => setFormData({ ...formData, rating: Number.parseFloat(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        rating: Number.parseFloat(e.target.value),
+                      })
+                    }
                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Description</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Description
+                  </label>
                   <textarea
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     rows={3}
                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
@@ -178,8 +206,8 @@ export default function AdminDashboard() {
                   <button
                     type="button"
                     onClick={() => {
-                      setShowForm(false)
-                      setEditingId(null)
+                      setShowForm(false);
+                      setEditingId(null);
                     }}
                     className="btn-secondary"
                   >
@@ -187,11 +215,11 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               </form>
-            </motion.div>
+            </div>
           )}
 
           {/* Products Table */}
-          <motion.div className="bg-card border border-border rounded-lg overflow-hidden">
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-primary text-primary-foreground">
@@ -204,18 +232,19 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product, index) => (
-                    <motion.tr
+                  {products.map((product) => (
+                    <tr
                       key={product._id}
                       className="border-t border-border hover:bg-accent transition-colors"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
                     >
                       <td className="px-6 py-4">{product.name}</td>
-                      <td className="px-6 py-4 capitalize">{product.category}</td>
-                      <td className="px-6 py-4">${product.price.toFixed(2)}</td>
-                      <td className="px-6 py-4">{product.rating.toFixed(1)}★</td>
+                      <td className="px-6 py-4 capitalize">
+                        {product.category}
+                      </td>
+                      <td className="px-6 py-4">৳{product.price.toLocaleString('en-BD')}</td>
+                      <td className="px-6 py-4">
+                        {product.rating.toFixed(1)}★
+                      </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(product)}
@@ -230,18 +259,18 @@ export default function AdminDashboard() {
                           <Trash2 size={18} />
                         </button>
                       </td>
-                    </motion.tr>
+                    </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </motion.div>
+          </div>
 
           <div className="mt-6 p-4 bg-accent rounded-lg">
             <p className="text-sm">Total Products: {products.length}</p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
-  )
+  );
 }

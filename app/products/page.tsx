@@ -4,11 +4,48 @@ import { useState, useEffect } from "react";
 import { Filter, ChevronDown } from "lucide-react";
 import { ProductCard } from "@/components/products/product-card";
 import { mockProducts } from "@/lib/mock-products";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function ProductsPage() {
-  const [sortBy, setSortBy] = useState("popularity");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [sortBy, setSortBy] = useState(
+    searchParams.get("sort") || "popularity"
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("category") || "all"
+  );
+  const [selectedSubCategory, setSelectedSubCategory] = useState(
+    searchParams.get("subCategory") || "all"
+  );
   const [products, setProducts] = useState(mockProducts);
+
+  // Update URL params
+  const updateURLParams = (
+    category: string,
+    subCategory: string,
+    sort: string
+  ) => {
+    const params = new URLSearchParams();
+
+    if (category !== "all") {
+      params.set("category", category);
+    }
+
+    if (subCategory !== "all" && category === "fashion") {
+      params.set("subcategory", subCategory);
+    }
+
+    if (sort !== "popularity") {
+      params.set("sort", sort);
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `?${queryString}` : "/products", {
+      scroll: false,
+    });
+  };
 
   useEffect(() => {
     let filtered = [...mockProducts];
@@ -16,6 +53,11 @@ export default function ProductsPage() {
     // Filter by category
     if (selectedCategory !== "all") {
       filtered = filtered.filter((p) => p.category === selectedCategory);
+    }
+
+    // Filter by subcategory for fashion
+    if (selectedCategory === "fashion" && selectedSubCategory !== "all") {
+      filtered = filtered.filter((p) => p.subCategory === selectedSubCategory);
     }
 
     // Sort
@@ -28,9 +70,37 @@ export default function ProductsPage() {
     }
 
     setProducts(filtered);
-  }, [sortBy, selectedCategory]);
+  }, [sortBy, selectedCategory, selectedSubCategory]);
 
-  const categories = ["all", "electronics", "fashion", "home", "beauty"];
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    // Reset subcategory when changing main category
+    if (cat !== "fashion") {
+      setSelectedSubCategory("all");
+    }
+    updateURLParams(
+      cat,
+      cat === "fashion" ? selectedSubCategory : "all",
+      sortBy
+    );
+  };
+
+  const handleSubCategoryChange = (subCat: string) => {
+    setSelectedSubCategory(subCat);
+    updateURLParams(selectedCategory, subCat, sortBy);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+    updateURLParams(selectedCategory, selectedSubCategory, sort);
+  };
+
+  const categories = ["all", "fashion", "electronics", "home", "beauty"];
+  const fashionSubCategories = [
+    { value: "all", label: "All Fashion" },
+    { value: "gents", label: "Gents" },
+    { value: "ladies", label: "Ladies" },
+  ];
   const sortOptions = [
     { value: "popularity", label: "Most Popular" },
     { value: "price-asc", label: "Price: Low to High" },
@@ -49,29 +119,54 @@ export default function ProductsPage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Filter size={20} />
-            <div className="flex gap-2 flex-wrap">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-full capitalize transition-colors ${
-                    selectedCategory === cat
-                      ? "bg-primary text-white"
-                      : "border border-border hover:border-primary"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+          <div className="flex flex-col gap-3 w-full md:w-auto">
+            {/* Main Category Filter */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Filter size={20} />
+              <div className="flex gap-2 flex-wrap">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleCategoryChange(cat)}
+                    className={`px-4 py-2 rounded-full capitalize transition-colors ${
+                      selectedCategory === cat
+                        ? "bg-primary text-white"
+                        : "border border-border hover:border-primary"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* Fashion Subcategory Filter */}
+            {selectedCategory === "fashion" && (
+              <div className="flex items-center gap-2 flex-wrap ml-7">
+                <span className="text-sm text-muted-foreground">Type:</span>
+                <div className="flex gap-2 flex-wrap">
+                  {fashionSubCategories.map((subCat) => (
+                    <button
+                      key={subCat.value}
+                      onClick={() => handleSubCategoryChange(subCat.value)}
+                      className={`px-3 py-1.5 text-sm rounded-full capitalize transition-colors ${
+                        selectedSubCategory === subCat.value
+                          ? "bg-primary text-white"
+                          : "border border-border hover:border-primary"
+                      }`}
+                    >
+                      {subCat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="relative w-full md:w-auto">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="appearance-none bg-background border border-border px-4 py-2 rounded-lg pr-10 cursor-pointer w-full md:w-auto"
             >
               {sortOptions.map((opt) => (
@@ -100,6 +195,14 @@ export default function ProductsPage() {
             />
           ))}
         </div>
+
+        {products.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              No products found matching your filters.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

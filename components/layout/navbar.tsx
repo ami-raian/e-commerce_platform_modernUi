@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react"
@@ -15,10 +15,15 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [mounted, setMounted] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const items = useCartStore((state) => state.items)
   const cartCount = items.reduce((total, item) => total + item.quantity, 0)
   const user = useAuthStore((state) => state.user)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,12 +70,12 @@ export function Navbar() {
             className="p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
             aria-label="Toggle theme"
           >
-            {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+            {mounted ? (theme === "light" ? <Moon size={20} /> : <Sun size={20} />) : <Moon size={20} />}
           </button>
 
           <Link href="/cart" className="p-2 hover:bg-accent rounded-lg transition-colors relative text-foreground">
             <ShoppingCart size={20} />
-            {cartCount > 0 && (
+            {mounted && cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                 {cartCount}
               </span>
@@ -78,7 +83,7 @@ export function Navbar() {
           </Link>
 
           {/* Auth Links */}
-          {user ? (
+          {mounted && user ? (
             <Link href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
               {user.name.split(" ")[0]}
             </Link>
@@ -133,7 +138,7 @@ export function Navbar() {
           <Link href="/about" className="text-foreground hover:text-primary transition-colors">
             About
           </Link>
-          {user ? (
+          {mounted && user ? (
             <>
               <Link href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
                 My Dashboard

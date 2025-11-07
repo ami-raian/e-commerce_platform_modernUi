@@ -72,30 +72,30 @@ export default function CartPage() {
               <div className="space-y-4 mb-6 pb-6 border-b border-border">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="font-medium">৳{subtotal.toLocaleString('en-BD')}</span>
                 </div>
 
                 {appliedCode && promoDiscount > 0 && (
                   <div className="flex justify-between text-success">
                     <span className="text-muted-foreground">Promo Discount ({appliedCode})</span>
-                    <span className="font-medium">-${promoDiscount.toFixed(2)}</span>
+                    <span className="font-medium">-৳{promoDiscount.toLocaleString('en-BD')}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax</span>
-                  <span className="font-medium">${tax.toFixed(2)}</span>
+                  <span className="font-medium">৳{tax.toLocaleString('en-BD')}</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span className="font-medium">{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                  <span className="font-medium">{shipping === 0 ? "Free" : `৳${shipping.toLocaleString('en-BD')}`}</span>
                 </div>
               </div>
 
               <div className="flex justify-between mb-6">
                 <span className="text-lg font-semibold">Total</span>
-                <span className="text-lg font-bold text-primary">${total.toFixed(2)}</span>
+                <span className="text-lg font-bold text-primary">৳{total.toLocaleString('en-BD')}</span>
               </div>
 
               <Link href="/checkout" className="btn-primary w-full text-center block mb-3">

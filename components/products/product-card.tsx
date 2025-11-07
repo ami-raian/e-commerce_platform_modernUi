@@ -1,21 +1,28 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Star, ShoppingCart } from "lucide-react"
-import { useCartStore } from "@/lib/cart-store"
-import { toast } from "sonner"
+import Link from "next/link";
+import { Star, ShoppingCart } from "lucide-react";
+import { useCartStore } from "@/lib/cart-store";
+import { toast } from "sonner";
 
 interface ProductCardProps {
-  id: string
-  name: string
-  price: number
-  image: string
-  category: string
-  rating: number
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  rating: number;
 }
 
-export function ProductCard({ id, name, price, image, category, rating }: ProductCardProps) {
-  const addItem = useCartStore((state) => state.addItem)
+export function ProductCard({
+  id,
+  name,
+  price,
+  image,
+  category,
+  rating,
+}: ProductCardProps) {
+  const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
     addItem({
@@ -24,12 +31,12 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
       price,
       quantity: 1,
       image,
-    })
+    });
     toast.success(`${name} added to cart!`, {
-      description: `$${price.toFixed(2)} - Quantity: 1`,
+      description: `৳${price.toLocaleString("en-BD")} - Quantity: 1`,
       duration: 2000,
-    })
-  }
+    });
+  };
 
   return (
     <Link href={`/product/${id}`} className="group cursor-pointer">
@@ -51,7 +58,11 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
                 <Star
                   key={i}
                   size={16}
-                  className={i < Math.floor(rating) ? "fill-primary text-primary" : "text-border"}
+                  className={
+                    i < Math.floor(rating)
+                      ? "fill-primary text-primary"
+                      : "text-border"
+                  }
                 />
               ))}
             </div>
@@ -59,11 +70,13 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
           </div>
 
           <div className="flex items-center justify-between mt-auto">
-            <span className="text-primary font-bold text-lg">${price.toFixed(2)}</span>
+            <span className="text-primary font-bold text-lg">
+              ৳{price.toLocaleString("en-BD")}
+            </span>
             <button
               onClick={(e) => {
-                e.preventDefault()
-                handleAddToCart()
+                e.preventDefault();
+                handleAddToCart();
               }}
               className="p-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
               aria-label="Add to cart"
@@ -74,5 +87,5 @@ export function ProductCard({ id, name, price, image, category, rating }: Produc
         </div>
       </div>
     </Link>
-  )
+  );
 }
