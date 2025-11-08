@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useProductStore } from "@/lib/product-store";
 import { ProductCard } from "@/components/products/product-card";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const searchProducts = useProductStore((state) => state.searchProducts);
@@ -105,5 +105,13 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background py-12"><div className="container-xl">Loading...</div></div>}>
+      <SearchContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ProgressBarProvider } from "@/components/providers/progress-bar-provider";
@@ -30,7 +31,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable}`}>
         <ThemeProvider>
-          <ProgressBarProvider />
+          <Suspense fallback={null}>
+            <ProgressBarProvider />
+          </Suspense>
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />

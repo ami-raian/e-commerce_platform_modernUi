@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Filter, ChevronDown } from "lucide-react";
 import { ProductCard } from "@/components/products/product-card";
 import { mockProducts } from "@/lib/mock-products";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function ProductsPage() {
+function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -205,5 +205,13 @@ export default function ProductsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="container-xl py-8">Loading...</div>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
