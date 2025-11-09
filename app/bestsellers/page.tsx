@@ -1,9 +1,14 @@
 import Link from "next/link"
 import { ProductCard } from "@/components/products/product-card"
-import { mockProducts } from "@/lib/mock-products"
+import { getBestsellers, getImageUrl } from "@/lib/api"
 
-export default function BestsellersPage() {
-  const bestsellers = mockProducts.filter((p) => p.rating >= 4.5).sort((a, b) => b.rating - a.rating)
+export default async function BestsellersPage() {
+  let bestsellers: any[] = [];
+  try {
+    bestsellers = await getBestsellers();
+  } catch (error) {
+    console.error("Failed to fetch bestsellers:", error);
+  }
 
   return (
     <div className="container-xl py-8">
@@ -28,7 +33,7 @@ export default function BestsellersPage() {
                 id={product._id}
                 name={product.name}
                 price={product.price}
-                image={product.image}
+                image={getImageUrl(product.images[0])}
                 category={product.category}
                 rating={product.rating}
               />

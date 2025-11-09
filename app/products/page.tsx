@@ -3,12 +3,14 @@
 import { useState, useEffect, Suspense } from "react";
 import { Filter, ChevronDown } from "lucide-react";
 import { ProductCard } from "@/components/products/product-card";
-import { mockProducts } from "@/lib/mock-products";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useProductStore, type Product } from "@/lib/product-store";
+import { getImageUrl } from "@/lib/api";
 
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { products, loading, fetchProducts } = useProductStore();
 
   const [sortBy, setSortBy] = useState(
     searchParams.get("sort") || "popularity"
@@ -19,7 +21,7 @@ function ProductsContent() {
   const [selectedSubCategory, setSelectedSubCategory] = useState(
     searchParams.get("subCategory") || "all"
   );
-  const [products, setProducts] = useState(mockProducts);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   // Update URL params
   const updateURLParams = (
@@ -47,8 +49,13 @@ function ProductsContent() {
     });
   };
 
+  // Fetch products on mount
   useEffect(() => {
-    let filtered = [...mockProducts];
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    let filtered = [...products];
 
     // Filter by category
     if (selectedCategory !== "all") {
@@ -69,8 +76,8 @@ function ProductsContent() {
       filtered.reverse();
     }
 
-    setProducts(filtered);
-  }, [sortBy, selectedCategory, selectedSubCategory]);
+    setFilteredProducts(filtered);
+  }, [sortBy, selectedCategory, selectedSubCategory, products]);
 
   const handleCategoryChange = (cat: string) => {
     setSelectedCategory(cat);
@@ -182,26 +189,34 @@ function ProductsContent() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard
-              key={product._id}
-              id={product._id}
-              name={product.name}
-              price={product.price}
-              image={product.image}
-              category={product.category}
-              rating={product.rating}
-            />
-          ))}
-        </div>
-
-        {products.length === 0 && (
+        {loading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No products found matching your filters.
-            </p>
+            <p className="text-muted-foreground">Loading products...</p>
           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  id={product._id}
+                  name={product.name}
+                  price={product.price}
+                  image={getImageUrl(product.images[0])}
+                  category={product.category}
+                  rating={product.rating}
+                />
+              ))}
+            </div>
+
+            {filteredProducts.length === 0 && !loading && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  No products found matching your filters.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

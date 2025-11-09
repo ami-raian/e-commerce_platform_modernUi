@@ -20,14 +20,18 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    const result = login(email, password);
-    if (result.success) {
-      router.push("/dashboard");
-    } else {
-      setError(result.error || "Login failed");
+    try {
+      const result = await login(email, password);
+      if (result.success) {
+        router.push("/dashboard");
+      } else {
+        setError(result.error || "Login failed");
+      }
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -87,12 +91,6 @@ export default function LoginPage() {
             Create one
           </Link>
         </p>
-
-        <div className="mt-6 p-4 bg-muted rounded-lg text-sm">
-          <p className="font-medium mb-2">Demo Credentials:</p>
-          <p>Admin: admin@example.com / admin123</p>
-          <p>User: user@example.com / user123</p>
-        </div>
       </div>
     </div>
   );
