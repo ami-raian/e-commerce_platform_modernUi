@@ -95,7 +95,7 @@ export default function AdminProductsPage() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <ProductForm
               onSubmit={async (data, images) => {
-                const result = await createProduct(data, images);
+                const result = await createProduct(data, images ?? []);
                 if (result) {
                   toast.success("Product created successfully!");
                   setIsCreateDialogOpen(false);

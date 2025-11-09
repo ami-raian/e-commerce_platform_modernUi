@@ -20,26 +20,33 @@ export default function UserDashboard() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const cartItems = useCartStore((state) => state.items);
-  const [orders, setOrders] = useState<Order[]>([
-    {
-      id: "ORD-001",
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0],
-      total: 299.99,
-      items: 3,
-      status: "completed",
-    },
-    {
-      id: "ORD-002",
-      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0],
-      total: 149.99,
-      items: 2,
-      status: "shipped",
-    },
-  ]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Initialize orders after mounting to avoid hydration mismatch
+    setOrders([
+      {
+        id: "ORD-001",
+        date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0],
+        total: 299.99,
+        items: 3,
+        status: "completed",
+      },
+      {
+        id: "ORD-002",
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0],
+        total: 149.99,
+        items: 2,
+        status: "shipped",
+      },
+    ]);
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -52,7 +59,7 @@ export default function UserDashboard() {
     router.push("/");
   };
 
-  if (!user) {
+  if (!user || !mounted) {
     return null;
   }
 
