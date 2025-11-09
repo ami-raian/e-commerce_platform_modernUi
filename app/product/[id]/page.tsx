@@ -6,6 +6,7 @@ import { ArrowLeft, Star, ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useProductStore, type Product } from "@/lib/product-store";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/api";
 
 export default function ProductPage({
   params,
@@ -28,6 +29,7 @@ export default function ProductPage({
       cancelled = true;
     };
   }, [fetchProductById, id]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -121,15 +123,66 @@ export default function ProductPage({
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Product Image */}
-        <div className="bg-accent h-96 rounded-lg overflow-hidden flex items-center justify-center">
-          <Image
-            src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product.images?.[0]}`}
-            alt={product.name}
-            width={400}
-            height={400}
-            className="w-full h-full object-cover"
-          />
+        {/* Product Image - main + thumbnails (supports 1-5 images) */}
+        <div className="space-y-3">
+          <div className="relative bg-accent h-96 rounded-lg overflow-hidden flex items-center justify-center">
+            <button
+              aria-label="Previous image"
+              onClick={() => setSelectedImageIndex((i) => Math.max(0, i - 1))}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40"
+            >
+              ‹
+            </button>
+
+            <Image
+              src={getImageUrl(
+                product.images?.[selectedImageIndex] ??
+                  product.images?.[0] ??
+                  "/placeholder.svg"
+              )}
+              alt={product.name}
+              width={800}
+              height={800}
+              className="w-full h-full object-cover"
+            />
+
+            <button
+              aria-label="Next image"
+              onClick={() =>
+                setSelectedImageIndex((i) =>
+                  Math.min((product.images?.length ?? 1) - 1, i + 1)
+                )
+              }
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40"
+            >
+              ›
+            </button>
+          </div>
+
+          {/* Thumbnails */}
+          <div className="flex gap-2">
+            {(product.images ?? ["/placeholder.svg"])
+              ?.slice(0, 5)
+              .map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`w-16 h-16 rounded overflow-hidden border ${
+                    selectedImageIndex === idx
+                      ? "border-primary"
+                      : "border-border"
+                  }`}
+                >
+                  <Image
+                    src={getImageUrl(img)}
+                    alt={`${product.name} ${idx + 1}`}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+          </div>
         </div>
 
         {/* Product Info */}
