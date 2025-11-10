@@ -7,6 +7,7 @@ import {
   getBestsellersAxios,
   createProductWithImagesAxios,
   updateProductAxios,
+  updateProductImagesAxios,
   hardDeleteProductAxios,
   type Product,
   type ProductFilters,
@@ -35,6 +36,12 @@ interface ProductStore {
     images: File[]
   ) => Promise<Product | null>;
   updateProduct: (id: string, updates: UpdateProductData) => Promise<boolean>;
+  updateProductWithImages: (
+    id: string,
+    productData: UpdateProductData,
+    newImages: File[],
+    existingImages: string[]
+  ) => Promise<Product | null>;
   deleteProduct: (id: string) => Promise<boolean>;
 
   // Local search (from already fetched products)
@@ -160,6 +167,50 @@ export const useProductStore = create<ProductStore>()((set, get) => ({
         loading: false,
       });
       return false;
+    }
+  },
+
+  // Update product with images (Admin)
+  updateProductWithImages: async (
+    id,
+    productData,
+    newImages,
+    existingImages
+  ) => {
+    set({ loading: true, error: null });
+    try {
+      // First update product data
+      const updatedProduct = await updateProductAxios(id, productData);
+
+      // Then update images if there are changes
+      if (newImages.length > 0 || existingImages.length > 0) {
+        const productWithImages = await updateProductImagesAxios(
+          id,
+          newImages,
+          existingImages
+        );
+        set((state) => ({
+          products: state.products.map((p) =>
+            p._id === id ? productWithImages : p
+          ),
+          loading: false,
+        }));
+        return productWithImages;
+      }
+
+      set((state) => ({
+        products: state.products.map((p) =>
+          p._id === id ? updatedProduct : p
+        ),
+        loading: false,
+      }));
+      return updatedProduct;
+    } catch (error: any) {
+      set({
+        error: error.message || "Failed to update product",
+        loading: false,
+      });
+      return null;
     }
   },
 

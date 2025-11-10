@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X, Upload, ImageIcon } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -29,95 +30,158 @@ import {
   productFormSchema,
   type CreateProductFormData,
 } from '@/lib/validations/product-schema'
-import { useProductStore } from '@/lib/product-store'
+import { useProductStore, type Product } from '@/lib/product-store'
 import { toast } from 'sonner'
 
 interface ProductFormProps {
+  product?: Product // If provided, form is in edit mode
   onSuccess?: () => void
   onCancel?: () => void
 }
 
-export function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
-  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) {
+  const isEditMode = !!product
+
+  // Existing images (from product)
+  const [existingImages, setExistingImages] = useState<string[]>(
+    product?.images || []
+  )
+  // New images to upload
+  const [newImages, setNewImages] = useState<File[]>([])
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([])
+
   const createProduct = useProductStore((state) => state.createProduct)
+  const updateProductWithImages = useProductStore(
+    (state) => state.updateProductWithImages
+  )
   const loading = useProductStore((state) => state.loading)
 
-  const form = useForm<CreateProductFormData>({
-    resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      price: 0,
-      category: 'electronics',
-      subCategory: null,
-      gender: null,
-      stock: 0,
-      rating: 0,
-      isFlashSale: false,
-      discount: 0,
-      isActive: true,
-      images: [],
-    },
+  // Modified schema for edit mode - make images optional
+  const editFormSchema = productFormSchema.omit({ images: true })
+
+  const form = useForm<CreateProductFormData | Omit<CreateProductFormData, 'images'>>({
+    resolver: zodResolver(isEditMode ? editFormSchema : productFormSchema),
+    defaultValues: isEditMode
+      ? {
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          category: product.category,
+          subCategory: product.subCategory,
+          gender: product.gender,
+          stock: product.stock,
+          rating: product.rating,
+          isFlashSale: product.isFlashSale,
+          discount: product.discount,
+          isActive: product.isActive,
+        }
+      : {
+          name: '',
+          description: '',
+          price: 0,
+          category: 'electronics',
+          subCategory: null,
+          gender: null,
+          stock: 0,
+          rating: 0,
+          isFlashSale: false,
+          discount: 0,
+          isActive: true,
+          images: [],
+        },
   })
 
-  // Handle image file selection
+  // Update existing images when product changes
+  useEffect(() => {
+    if (product?.images) {
+      setExistingImages(product.images)
+    }
+  }, [product])
+
+  // Handle new image file selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
     const fileArray = Array.from(files)
-    const currentImages = form.getValues('images') || []
+    const totalImages = existingImages.length + newImages.length + fileArray.length
 
     // Limit to 5 images total
-    if (currentImages.length + fileArray.length > 5) {
+    if (totalImages > 5) {
       toast.error('Maximum 5 images allowed')
       return
     }
 
-    // Update form with new files
-    form.setValue('images', [...currentImages, ...fileArray], {
-      shouldValidate: true,
-    })
+    // Add new files
+    setNewImages((prev) => [...prev, ...fileArray])
 
-    // Create previews
+    // Create previews for new images
     fileArray.forEach((file) => {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setImagePreviews((prev) => [...prev, reader.result as string])
+        setNewImagePreviews((prev) => [...prev, reader.result as string])
       }
       reader.readAsDataURL(file)
     })
   }
 
-  // Remove image by index
-  const removeImage = (index: number) => {
-    const currentImages = form.getValues('images')
-    const newImages = currentImages.filter((_, i) => i !== index)
-    form.setValue('images', newImages, { shouldValidate: true })
+  // Remove existing image
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index))
+  }
 
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index))
+  // Remove new image
+  const removeNewImage = (index: number) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index))
+    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index))
   }
 
   // Handle form submission
-  const onSubmit = async (data: CreateProductFormData) => {
+  const onSubmit = async (data: any) => {
     try {
-      const { images, ...productData } = data
+      if (isEditMode) {
+        // Edit mode
+        const totalImages = existingImages.length + newImages.length
+        if (totalImages < 1) {
+          toast.error('Product must have at least 1 image')
+          return
+        }
 
-      // Create product with images
-      const product = await createProduct(productData, images)
+        const updatedProduct = await updateProductWithImages(
+          product._id,
+          data,
+          newImages,
+          existingImages
+        )
 
-      if (product) {
-        toast.success('Product created successfully!')
-        form.reset()
-        setImagePreviews([])
-        onSuccess?.()
+        if (updatedProduct) {
+          toast.success('Product updated successfully!')
+          onSuccess?.()
+        } else {
+          toast.error('Failed to update product')
+        }
       } else {
-        toast.error('Failed to create product')
+        // Create mode
+        const { images, ...productData } = data
+
+        const createdProduct = await createProduct(productData, images)
+
+        if (createdProduct) {
+          toast.success('Product created successfully!')
+          form.reset()
+          setNewImages([])
+          setNewImagePreviews([])
+          onSuccess?.()
+        } else {
+          toast.error('Failed to create product')
+        }
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create product')
+      toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'create'} product`)
     }
   }
+
+  const totalImageCount = existingImages.length + newImages.length
 
   return (
     <Form {...form}>
@@ -362,87 +426,113 @@ export function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
           )}
         />
 
-        {/* Image Upload */}
-        <FormField
-          control={form.control}
-          name="images"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Images *</FormLabel>
-              <FormControl>
-                <div className="space-y-4">
-                  {/* Upload Button */}
-                  <div className="flex items-center gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={loading || imagePreviews.length >= 5}
-                      onClick={() =>
-                        document.getElementById('image-upload')?.click()
-                      }
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Images
-                    </Button>
-                    <span className="text-sm text-muted-foreground">
-                      {imagePreviews.length}/5 images
-                    </span>
-                  </div>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleImageChange}
-                    disabled={loading}
-                  />
+        {/* Image Upload/Management */}
+        <div className="space-y-4">
+          <FormLabel>Product Images *</FormLabel>
 
-                  {/* Image Previews */}
-                  {imagePreviews.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                      {imagePreviews.map((preview, index) => (
-                        <Card key={index} className="relative group">
-                          <CardContent className="p-2">
-                            <img
-                              src={preview}
-                              alt={`Preview ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-md"
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="icon"
-                              className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => removeImage(index)}
-                              disabled={loading}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
+          {/* Upload Button */}
+          <div className="flex items-center gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={loading || totalImageCount >= 5}
+              onClick={() => document.getElementById('image-upload')?.click()}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Upload Images
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              {totalImageCount}/5 images
+            </span>
+          </div>
+          <input
+            id="image-upload"
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleImageChange}
+            disabled={loading}
+          />
 
-                  {imagePreviews.length === 0 && (
-                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                      <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        No images uploaded yet. Click "Upload Images" to add 1-5
-                        images.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </FormControl>
-              <FormDescription>
-                Upload 1-5 product images (JPG, PNG, or WebP)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
+          {/* Existing Images (Edit Mode) */}
+          {isEditMode && existingImages.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-2">Current Images</p>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {existingImages.map((imagePath, index) => (
+                  <Card key={`existing-${index}`} className="relative group">
+                    <CardContent className="p-2">
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_IMG_URL}/${imagePath}`}
+                        alt={`Existing ${index + 1}`}
+                        width={200}
+                        height={128}
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removeExistingImage(index)}
+                        disabled={loading}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
           )}
-        />
+
+          {/* New Image Previews */}
+          {newImagePreviews.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-2">
+                {isEditMode ? 'New Images' : 'Selected Images'}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {newImagePreviews.map((preview, index) => (
+                  <Card key={`new-${index}`} className="relative group">
+                    <CardContent className="p-2">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removeNewImage(index)}
+                        disabled={loading}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* No Images State */}
+          {!isEditMode && totalImageCount === 0 && (
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+              <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+              <p className="mt-2 text-sm text-muted-foreground">
+                No images uploaded yet. Click "Upload Images" to add 1-5 images.
+              </p>
+            </div>
+          )}
+
+          <FormDescription>
+            Upload 1-5 product images (JPG, PNG, or WebP)
+          </FormDescription>
+        </div>
 
         {/* Checkboxes */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -496,7 +586,13 @@ export function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
         {/* Form Actions */}
         <div className="flex gap-4">
           <Button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Product'}
+            {loading
+              ? isEditMode
+                ? 'Updating...'
+                : 'Creating...'
+              : isEditMode
+                ? 'Update Product'
+                : 'Create Product'}
           </Button>
           {onCancel && (
             <Button

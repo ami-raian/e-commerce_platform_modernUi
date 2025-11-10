@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { useProductStore, type Product } from "@/lib/product-store";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Edit } from "lucide-react";
 import { ProductForm } from "@/components/admin/product-form";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -19,6 +19,7 @@ export default function AdminDashboard() {
   const deleteProduct = useProductStore((state) => state.deleteProduct);
 
   const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -40,9 +41,20 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setShowForm(true);
+  };
+
   const handleFormSuccess = () => {
     setShowForm(false);
+    setEditingProduct(null);
     fetchProducts(); // Refresh product list
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setEditingProduct(null);
   };
 
   if (!user || user.role !== "admin") {
@@ -58,7 +70,10 @@ export default function AdminDashboard() {
               Admin Dashboard
             </h1>
             <button
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                setShowForm(!showForm);
+                setEditingProduct(null);
+              }}
               className="btn-primary flex items-center gap-2"
             >
               <Plus size={20} />
@@ -70,11 +85,12 @@ export default function AdminDashboard() {
           {showForm && (
             <div className="bg-card border border-border rounded-lg p-6 mb-8">
               <h2 className="text-2xl font-serif font-bold mb-6">
-                Add New Product
+                {editingProduct ? "Edit Product" : "Add New Product"}
               </h2>
               <ProductForm
+                product={editingProduct || undefined}
                 onSuccess={handleFormSuccess}
-                onCancel={() => setShowForm(false)}
+                onCancel={handleFormCancel}
               />
             </div>
           )}
@@ -158,6 +174,13 @@ export default function AdminDashboard() {
                         </div>
                       </td>
                       <td className="px-6 py-4 flex gap-2">
+                        <button
+                          onClick={() => handleEdit(product)}
+                          className="p-2 hover:bg-blue-500 hover:text-white rounded-lg transition-colors"
+                          title="Edit product"
+                        >
+                          <Edit size={18} />
+                        </button>
                         <button
                           onClick={() => handleDelete(product._id)}
                           className="p-2 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
