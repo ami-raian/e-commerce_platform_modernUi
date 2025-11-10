@@ -18,6 +18,7 @@ interface Order {
 export default function UserDashboard() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const authLoading = useAuthStore((state) => state.loading);
   const logout = useAuthStore((state) => state.logout);
   const cartItems = useCartStore((state) => state.items);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -49,17 +50,32 @@ export default function UserDashboard() {
   }, []);
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking user
+    if (authLoading) return;
+
     if (!user) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   const handleLogout = () => {
     logout();
     router.push("/");
   };
 
-  if (!user || !mounted) {
+  // Show loading spinner while checking authentication
+  if (authLoading || !mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
     return null;
   }
 
@@ -160,7 +176,7 @@ export default function UserDashboard() {
           </div>
 
           {/* Recent Orders */}
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
+          {/* <div className="bg-card border border-border rounded-lg overflow-hidden">
             <div className="p-6 border-b border-border">
               <h2 className="text-2xl font-serif font-bold">Recent Orders</h2>
             </div>
@@ -233,7 +249,7 @@ export default function UserDashboard() {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

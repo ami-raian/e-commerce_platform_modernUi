@@ -14,6 +14,7 @@ import Image from "next/image";
 export default function AdminDashboard() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const authLoading = useAuthStore((state) => state.loading);
   const products = useProductStore((state) => state.products);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
@@ -22,13 +23,16 @@ export default function AdminDashboard() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking user
+    if (authLoading) return;
+
     if (!user || user.role !== "admin") {
       router.push("/login");
     } else {
       // Fetch products when admin dashboard loads
       fetchProducts();
     }
-  }, [user, router, fetchProducts]);
+  }, [user, authLoading, router, fetchProducts]);
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
@@ -57,6 +61,19 @@ export default function AdminDashboard() {
     setEditingProduct(null);
   };
 
+  // Show loading spinner while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
   if (!user || user.role !== "admin") {
     return null;
   }
