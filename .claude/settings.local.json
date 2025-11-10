@@ -8,7 +8,10 @@
       "Bash(npx tsc:*)",
       "Bash(npm uninstall:*)",
       "Bash(npm run build:*)",
-      "Bash(timeout /t 10)"
+      "Bash(timeout /t 10)",
+      "Bash(nul)",
+      "Bash(dir /s /b \"C:\\Users\\Rai_An\\Documents\\GitHub\\e-commerce-platform-modernUi\")",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

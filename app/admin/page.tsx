@@ -6,69 +6,43 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { useProductStore, type Product } from "@/lib/product-store";
-import { Trash2, Edit2, Plus } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
+import { ProductForm } from "@/components/admin/product-form";
+import { toast } from "sonner";
+import Image from "next/image";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const products = useProductStore((state) => state.products);
+  const fetchProducts = useProductStore((state) => state.fetchProducts);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
-  const addProduct = useProductStore((state) => state.addProduct);
-  const updateProduct = useProductStore((state) => state.updateProduct);
 
   const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    price: 0,
-    category: "electronics",
-    description: "",
-    image: "/diverse-products-still-life.png",
-    rating: 4.5,
-  });
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
       router.push("/login");
-    }
-  }, [user, router]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingId) {
-      updateProduct(editingId, formData);
-      setEditingId(null);
     } else {
-      addProduct(formData as Omit<Product, "_id">);
+      // Fetch products when admin dashboard loads
+      fetchProducts();
     }
-    setFormData({
-      name: "",
-      price: 0,
-      category: "electronics",
-      description: "",
-      image: "/diverse-products-still-life.png",
-      rating: 4.5,
-    });
-    setShowForm(false);
-  };
+  }, [user, router, fetchProducts]);
 
-  const handleEdit = (product: Product) => {
-    setFormData({
-      name: product.name,
-      price: product.price,
-      category: product.category,
-      description: product.description || "",
-      image: product.image,
-      rating: product.rating,
-    });
-    setEditingId(product._id);
-    setShowForm(true);
-  };
-
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      deleteProduct(id);
+      const success = await deleteProduct(id);
+      if (success) {
+        toast.success("Product deleted successfully");
+      } else {
+        toast.error("Failed to delete product");
+      }
     }
+  };
+
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    fetchProducts(); // Refresh product list
   };
 
   if (!user || user.role !== "admin") {
@@ -84,137 +58,24 @@ export default function AdminDashboard() {
               Admin Dashboard
             </h1>
             <button
-              onClick={() => {
-                setShowForm(!showForm);
-                setEditingId(null);
-                setFormData({
-                  name: "",
-                  price: 0,
-                  category: "electronics",
-                  description: "",
-                  image: "/diverse-products-still-life.png",
-                  rating: 4.5,
-                });
-              }}
+              onClick={() => setShowForm(!showForm)}
               className="btn-primary flex items-center gap-2"
             >
               <Plus size={20} />
-              Add Product
+              {showForm ? "Hide Form" : "Add Product"}
             </button>
           </div>
 
           {/* Product Form */}
           {showForm && (
             <div className="bg-card border border-border rounded-lg p-6 mb-8">
-              <h2 className="text-2xl font-serif font-bold mb-4">
-                {editingId ? "Edit Product" : "Add New Product"}
+              <h2 className="text-2xl font-serif font-bold mb-6">
+                Add New Product
               </h2>
-              <form
-                onSubmit={handleSubmit}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              >
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Product Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Price
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        price: Number.parseFloat(e.target.value),
-                      })
-                    }
-                    required
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option>electronics</option>
-                    <option>fashion</option>
-                    <option>home</option>
-                    <option>beauty</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Rating
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    value={formData.rating}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        rating: Number.parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    rows={3}
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div className="md:col-span-2 flex gap-2">
-                  <button type="submit" className="btn-primary">
-                    {editingId ? "Update Product" : "Add Product"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false);
-                      setEditingId(null);
-                    }}
-                    className="btn-secondary"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+              <ProductForm
+                onSuccess={handleFormSuccess}
+                onCancel={() => setShowForm(false)}
+              />
             </div>
           )}
 
@@ -224,10 +85,13 @@ export default function AdminDashboard() {
               <table className="w-full">
                 <thead className="bg-primary text-primary-foreground">
                   <tr>
+                    <th className="px-6 py-3 text-left">Image</th>
                     <th className="px-6 py-3 text-left">Name</th>
                     <th className="px-6 py-3 text-left">Category</th>
+                    <th className="px-6 py-3 text-left">Stock</th>
                     <th className="px-6 py-3 text-left">Price</th>
-                    <th className="px-6 py-3 text-left">Rating</th>
+                    <th className="px-6 py-3 text-left">Discount</th>
+                    <th className="px-6 py-3 text-left">Status</th>
                     <th className="px-6 py-3 text-left">Actions</th>
                   </tr>
                 </thead>
@@ -237,24 +101,67 @@ export default function AdminDashboard() {
                       key={product._id}
                       className="border-t border-border hover:bg-accent transition-colors"
                     >
-                      <td className="px-6 py-4">{product.name}</td>
-                      <td className="px-6 py-4 capitalize">
-                        {product.category}
-                      </td>
-                      <td className="px-6 py-4">৳{product.price.toLocaleString('en-BD')}</td>
                       <td className="px-6 py-4">
-                        {product.rating.toFixed(1)}★
+                        {product.images && product.images[0] ? (
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product.images[0]}`}
+                            alt={product.name}
+                            width={48}
+                            height={48}
+                            className="object-cover rounded"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-xs">
+                            No Image
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 font-medium">{product.name}</td>
+                      <td className="px-6 py-4">
+                        <span className="capitalize">{product.category}</span>
+                        {product.subCategory && (
+                          <span className="text-xs text-muted-foreground ml-1">
+                            ({product.subCategory})
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">{product.stock}</td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <div>৳{product.price.toLocaleString("en-BD")}</div>
+                          {product.discount > 0 && (
+                            <div className="text-xs text-green-600">
+                              Save {product.discount}%
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {product.discount > 0 ? `${product.discount}%` : "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${
+                              product.isActive
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {product.isActive ? "Active" : "Inactive"}
+                          </span>
+                          {product.isFlashSale && (
+                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">
+                              Flash Sale
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
-                          onClick={() => handleEdit(product)}
-                          className="p-2 hover:bg-primary hover:text-white rounded-lg transition-colors"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button
                           onClick={() => handleDelete(product._id)}
                           className="p-2 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
+                          title="Delete product"
                         >
                           <Trash2 size={18} />
                         </button>
