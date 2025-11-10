@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { X, Upload, ImageIcon } from 'lucide-react'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { X, Upload, ImageIcon } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,52 +14,58 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent } from '@/components/ui/card'
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   productFormSchema,
   type CreateProductFormData,
-} from '@/lib/validations/product-schema'
-import { useProductStore, type Product } from '@/lib/product-store'
-import { toast } from 'sonner'
+} from "@/lib/validations/product-schema";
+import { useProductStore, type Product } from "@/lib/product-store";
+import { toast } from "sonner";
 
 interface ProductFormProps {
-  product?: Product // If provided, form is in edit mode
-  onSuccess?: () => void
-  onCancel?: () => void
+  product?: Product; // If provided, form is in edit mode
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) {
-  const isEditMode = !!product
+export function ProductForm({
+  product,
+  onSuccess,
+  onCancel,
+}: ProductFormProps) {
+  const isEditMode = !!product;
 
   // Existing images (from product)
   const [existingImages, setExistingImages] = useState<string[]>(
     product?.images || []
-  )
+  );
   // New images to upload
-  const [newImages, setNewImages] = useState<File[]>([])
-  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([])
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
-  const createProduct = useProductStore((state) => state.createProduct)
+  const createProduct = useProductStore((state) => state.createProduct);
   const updateProductWithImages = useProductStore(
     (state) => state.updateProductWithImages
-  )
-  const loading = useProductStore((state) => state.loading)
+  );
+  const loading = useProductStore((state) => state.loading);
 
   // Modified schema for edit mode - make images optional
-  const editFormSchema = productFormSchema.omit({ images: true })
+  const editFormSchema = productFormSchema.omit({ images: true });
 
-  const form = useForm<CreateProductFormData | Omit<CreateProductFormData, 'images'>>({
+  const form = useForm<
+    CreateProductFormData | Omit<CreateProductFormData, "images">
+  >({
     resolver: zodResolver(isEditMode ? editFormSchema : productFormSchema),
     defaultValues: isEditMode
       ? {
@@ -76,10 +82,10 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           isActive: product.isActive,
         }
       : {
-          name: '',
-          description: '',
+          name: "",
+          description: "",
           price: 0,
-          category: 'electronics',
+          category: "electronics",
           subCategory: null,
           gender: null,
           stock: 0,
@@ -89,62 +95,63 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           isActive: true,
           images: [],
         },
-  })
+  });
 
   // Update existing images when product changes
   useEffect(() => {
     if (product?.images) {
-      setExistingImages(product.images)
+      setExistingImages(product.images);
     }
-  }, [product])
+  }, [product]);
 
   // Handle new image file selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    const fileArray = Array.from(files)
-    const totalImages = existingImages.length + newImages.length + fileArray.length
+    const fileArray = Array.from(files);
+    const totalImages =
+      existingImages.length + newImages.length + fileArray.length;
 
     // Limit to 5 images total
     if (totalImages > 5) {
-      toast.error('Maximum 5 images allowed')
-      return
+      toast.error("Maximum 5 images allowed");
+      return;
     }
 
     // Add new files
-    setNewImages((prev) => [...prev, ...fileArray])
+    setNewImages((prev) => [...prev, ...fileArray]);
 
     // Create previews for new images
     fileArray.forEach((file) => {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setNewImagePreviews((prev) => [...prev, reader.result as string])
-      }
-      reader.readAsDataURL(file)
-    })
-  }
+        setNewImagePreviews((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   // Remove existing image
   const removeExistingImage = (index: number) => {
-    setExistingImages((prev) => prev.filter((_, i) => i !== index))
-  }
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // Remove new image
   const removeNewImage = (index: number) => {
-    setNewImages((prev) => prev.filter((_, i) => i !== index))
-    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index))
-  }
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // Handle form submission
   const onSubmit = async (data: any) => {
     try {
       if (isEditMode) {
         // Edit mode
-        const totalImages = existingImages.length + newImages.length
+        const totalImages = existingImages.length + newImages.length;
         if (totalImages < 1) {
-          toast.error('Product must have at least 1 image')
-          return
+          toast.error("Product must have at least 1 image");
+          return;
         }
 
         const updatedProduct = await updateProductWithImages(
@@ -152,36 +159,38 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           data,
           newImages,
           existingImages
-        )
+        );
 
         if (updatedProduct) {
-          toast.success('Product updated successfully!')
-          onSuccess?.()
+          toast.success("Product updated successfully!");
+          onSuccess?.();
         } else {
-          toast.error('Failed to update product')
+          toast.error("Failed to update product");
         }
       } else {
         // Create mode
-        const { images, ...productData } = data
+        const { images, ...productData } = data;
 
-        const createdProduct = await createProduct(productData, images)
+        const createdProduct = await createProduct(productData, images);
 
         if (createdProduct) {
-          toast.success('Product created successfully!')
-          form.reset()
-          setNewImages([])
-          setNewImagePreviews([])
-          onSuccess?.()
+          toast.success("Product created successfully!");
+          form.reset();
+          setNewImages([]);
+          setNewImagePreviews([]);
+          onSuccess?.();
         } else {
-          toast.error('Failed to create product')
+          toast.error("Failed to create product");
         }
       }
     } catch (error: any) {
-      toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'create'} product`)
+      toast.error(
+        error.message || `Failed to ${isEditMode ? "update" : "create"} product`
+      );
     }
-  }
+  };
 
-  const totalImageCount = existingImages.length + newImages.length
+  const totalImageCount = existingImages.length + newImages.length;
 
   return (
     <Form {...form}>
@@ -219,10 +228,10 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                     type="number"
                     step="0.01"
                     placeholder="0.00"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
-                      const value = parseFloat(e.target.value)
-                      field.onChange(isNaN(value) ? 0 : value)
+                      const value = parseFloat(e.target.value);
+                      field.onChange(isNaN(value) ? 0 : value);
                     }}
                     disabled={loading}
                   />
@@ -271,9 +280,9 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                 <FormLabel>Sub Category</FormLabel>
                 <Select
                   onValueChange={(value) =>
-                    field.onChange(value === 'none' ? null : value)
+                    field.onChange(value === "none" ? null : value)
                   }
-                  defaultValue={field.value || 'none'}
+                  defaultValue={field.value || "none"}
                   disabled={loading}
                 >
                   <FormControl>
@@ -301,9 +310,9 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                 <FormLabel>Gender</FormLabel>
                 <Select
                   onValueChange={(value) =>
-                    field.onChange(value === 'none' ? null : value)
+                    field.onChange(value === "none" ? null : value)
                   }
-                  defaultValue={field.value || 'none'}
+                  defaultValue={field.value || "none"}
                   disabled={loading}
                 >
                   <FormControl>
@@ -334,10 +343,10 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                   <Input
                     type="number"
                     placeholder="0"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
-                      const value = parseInt(e.target.value)
-                      field.onChange(isNaN(value) ? 0 : value)
+                      const value = parseInt(e.target.value);
+                      field.onChange(isNaN(value) ? 0 : value);
                     }}
                     disabled={loading}
                   />
@@ -361,10 +370,10 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                     min="0"
                     max="5"
                     placeholder="0.0"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
-                      const value = parseFloat(e.target.value)
-                      field.onChange(isNaN(value) ? 0 : value)
+                      const value = parseFloat(e.target.value);
+                      field.onChange(isNaN(value) ? 0 : value);
                     }}
                     disabled={loading}
                   />
@@ -388,15 +397,17 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                     min="0"
                     max="100"
                     placeholder="0"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
-                      const value = parseFloat(e.target.value)
-                      field.onChange(isNaN(value) ? 0 : value)
+                      const value = parseFloat(e.target.value);
+                      field.onChange(isNaN(value) ? 0 : value);
                     }}
                     disabled={loading}
                   />
                 </FormControl>
-                <FormDescription>Enter discount percentage (0-100)</FormDescription>
+                <FormDescription>
+                  Enter discount percentage (0-100)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -436,7 +447,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
               type="button"
               variant="outline"
               disabled={loading || totalImageCount >= 5}
-              onClick={() => document.getElementById('image-upload')?.click()}
+              onClick={() => document.getElementById("image-upload")?.click()}
             >
               <Upload className="mr-2 h-4 w-4" />
               Upload Images
@@ -491,7 +502,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           {newImagePreviews.length > 0 && (
             <div>
               <p className="text-sm font-medium mb-2">
-                {isEditMode ? 'New Images' : 'Selected Images'}
+                {isEditMode ? "New Images" : "Selected Images"}
               </p>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {newImagePreviews.map((preview, index) => (
@@ -588,11 +599,11 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           <Button type="submit" disabled={loading}>
             {loading
               ? isEditMode
-                ? 'Updating...'
-                : 'Creating...'
+                ? "Updating..."
+                : "Creating..."
               : isEditMode
-                ? 'Update Product'
-                : 'Create Product'}
+              ? "Update Product"
+              : "Create Product"}
           </Button>
           {onCancel && (
             <Button
@@ -607,5 +618,5 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         </div>
       </form>
     </Form>
-  )
+  );
 }
