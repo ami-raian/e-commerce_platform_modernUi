@@ -6,10 +6,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { useProductStore, type Product } from "@/lib/product-store";
-import { Trash2, Plus, Edit } from "lucide-react";
-import { ProductForm } from "@/components/admin/product-form";
+import { Trash2, Plus, Edit, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -18,9 +26,10 @@ export default function AdminDashboard() {
   const products = useProductStore((state) => state.products);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
+  const softDeleteProduct = useProductStore((state) => state.softDeleteProduct);
 
-  const [showForm, setShowForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   useEffect(() => {
     // Wait for auth to finish loading before checking user
@@ -34,31 +43,43 @@ export default function AdminDashboard() {
     }
   }, [user, authLoading, router, fetchProducts]);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      const success = await deleteProduct(id);
-      if (success) {
-        toast.success("Product deleted successfully");
-      } else {
-        toast.error("Failed to delete product");
-      }
+  const handleEdit = (productId: string) => {
+    router.push(`/admin/products/${productId}/edit`);
+  };
+
+  const handleAddProduct = () => {
+    router.push("/admin/products/create");
+  };
+
+  const openDeleteModal = (product: Product) => {
+    setProductToDelete(product);
+    setDeleteModalOpen(true);
+  };
+
+  const handleSoftDelete = async () => {
+    if (!productToDelete) return;
+
+    const success = await softDeleteProduct(productToDelete._id);
+    if (success) {
+      toast.success("Product moved to trash");
+      setDeleteModalOpen(false);
+      setProductToDelete(null);
+    } else {
+      toast.error("Failed to delete product");
     }
   };
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setShowForm(true);
-  };
+  const handleHardDelete = async () => {
+    if (!productToDelete) return;
 
-  const handleFormSuccess = () => {
-    setShowForm(false);
-    setEditingProduct(null);
-    fetchProducts(); // Refresh product list
-  };
-
-  const handleFormCancel = () => {
-    setShowForm(false);
-    setEditingProduct(null);
+    const success = await deleteProduct(productToDelete._id);
+    if (success) {
+      toast.success("Product permanently deleted");
+      setDeleteModalOpen(false);
+      setProductToDelete(null);
+    } else {
+      toast.error("Failed to delete product");
+    }
   };
 
   // Show loading spinner while checking authentication
@@ -87,30 +108,13 @@ export default function AdminDashboard() {
               Admin Dashboard
             </h1>
             <button
-              onClick={() => {
-                setShowForm(!showForm);
-                setEditingProduct(null);
-              }}
+              onClick={handleAddProduct}
               className="btn-primary flex items-center gap-2"
             >
               <Plus size={20} />
-              {showForm ? "Hide Form" : "Add Product"}
+              Add Product
             </button>
           </div>
-
-          {/* Product Form */}
-          {showForm && (
-            <div className="bg-card border border-border rounded-lg p-6 mb-8">
-              <h2 className="text-2xl font-serif font-bold mb-6">
-                {editingProduct ? "Edit Product" : "Add New Product"}
-              </h2>
-              <ProductForm
-                product={editingProduct || undefined}
-                onSuccess={handleFormSuccess}
-                onCancel={handleFormCancel}
-              />
-            </div>
-          )}
 
           {/* Products Table */}
           <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -192,14 +196,14 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
-                          onClick={() => handleEdit(product)}
+                          onClick={() => handleEdit(product._id)}
                           className="p-2 hover:bg-blue-500 hover:text-white rounded-lg transition-colors"
                           title="Edit product"
                         >
                           <Edit size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(product._id)}
+                          onClick={() => openDeleteModal(product)}
                           className="p-2 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
                           title="Delete product"
                         >
@@ -218,6 +222,65 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="space-y-2">
+              <p>
+                Are you sure you want to delete{" "}
+                <span className="font-semibold">{productToDelete?.name}</span>?
+              </p>
+              <p className="text-sm">
+                Choose how you want to delete this product:
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-semibold mb-1">Soft Delete</h4>
+              <p className="text-xs text-muted-foreground mb-3">
+                Move to trash. Can be restored later.
+              </p>
+              <Button
+                variant="outline"
+                onClick={handleSoftDelete}
+                className="w-full"
+              >
+                Move to Trash
+              </Button>
+            </div>
+
+            <div className="p-4 border border-red-200 rounded-lg">
+              <h4 className="font-semibold mb-1 text-red-600">
+                Permanent Delete
+              </h4>
+              <p className="text-xs text-muted-foreground mb-3">
+                Delete forever. This cannot be undone.
+              </p>
+              <Button
+                variant="destructive"
+                onClick={handleHardDelete}
+                className="w-full"
+              >
+                Delete Forever
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

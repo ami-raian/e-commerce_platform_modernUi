@@ -8,6 +8,7 @@ import {
   createProductWithImagesAxios,
   updateProductAxios,
   updateProductImagesAxios,
+  softDeleteProductAxios,
   hardDeleteProductAxios,
   type Product,
   type ProductFilters,
@@ -42,6 +43,7 @@ interface ProductStore {
     newImages: File[],
     existingImages: string[]
   ) => Promise<Product | null>;
+  softDeleteProduct: (id: string) => Promise<boolean>;
   deleteProduct: (id: string) => Promise<boolean>;
 
   // Local search (from already fetched products)
@@ -214,7 +216,26 @@ export const useProductStore = create<ProductStore>()((set, get) => ({
     }
   },
 
-  // Delete product (Admin)
+  // Soft delete product (Admin) - Moves to trash
+  softDeleteProduct: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await softDeleteProductAxios(id);
+      set((state) => ({
+        products: state.products.filter((p) => p._id !== id),
+        loading: false,
+      }));
+      return true;
+    } catch (error: any) {
+      set({
+        error: error.message || "Failed to delete product",
+        loading: false,
+      });
+      return false;
+    }
+  },
+
+  // Hard delete product (Admin) - Permanently deletes
   deleteProduct: async (id) => {
     set({ loading: true, error: null });
     try {
