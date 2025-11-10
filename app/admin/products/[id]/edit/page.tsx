@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, use } from "react";
 import { useAuthStore } from "@/lib/auth-store";
 import { useProductStore, type Product } from "@/lib/product-store";
@@ -16,7 +16,8 @@ interface EditProductPageProps {
 
 export default function EditProductPage({ params }: EditProductPageProps) {
   // Unwrap the params Promise using React's use hook
-  const { id } = use(params);
+  // const { id } = use(params);
+  const { id } = useParams();
 
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -41,7 +42,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       setProductLoading(true);
       setError(null);
       try {
-        const fetchedProduct = await fetchProductById(id);
+        const fetchedProduct = await fetchProductById(String(id));
         if (fetchedProduct) {
           setProduct(fetchedProduct);
         } else {
