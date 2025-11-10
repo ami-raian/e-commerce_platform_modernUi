@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useAuthStore } from "@/lib/auth-store";
 import { useProductStore, type Product } from "@/lib/product-store";
 import { ProductForm } from "@/components/admin/product-form";
@@ -9,13 +9,15 @@ import { ArrowLeft, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
 interface EditProductPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditProductPage({ params }: EditProductPageProps) {
-  console.log(params.id, "params.id");
+  // Unwrap the params Promise using React's use hook
+  const { id } = use(params);
+
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const authLoading = useAuthStore((state) => state.loading);
@@ -39,7 +41,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       setProductLoading(true);
       setError(null);
       try {
-        const fetchedProduct = await fetchProductById(params.id);
+        const fetchedProduct = await fetchProductById(id);
         if (fetchedProduct) {
           setProduct(fetchedProduct);
         } else {
@@ -53,7 +55,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     };
 
     loadProduct();
-  }, [user, authLoading, router, params.id, fetchProductById]);
+  }, [user, authLoading, router, id, fetchProductById]);
 
   // Show loading spinner while checking authentication or loading product
   if (authLoading || productLoading) {
