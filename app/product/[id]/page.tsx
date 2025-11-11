@@ -321,7 +321,7 @@ export default function ProductPage({
           </div>
 
           {/* Add to Cart Button */}
-          <div className="space-y-4">
+          <div className="space-y-8">
             <button
               onClick={handleAddToCart}
               className="w-full btn-primary py-4 text-lg flex items-center justify-center gap-2"
