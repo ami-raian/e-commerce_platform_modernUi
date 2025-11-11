@@ -5,6 +5,14 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.marqenbd.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 
