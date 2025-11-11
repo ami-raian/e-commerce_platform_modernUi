@@ -86,11 +86,15 @@ export async function changePassword(
 
 /**
  * Verify auth token and get user
+ * Returns null if token is invalid or missing (without throwing)
+ * This is normal for non-authenticated users on public pages
  */
 export async function verifyToken(): Promise<User | null> {
   try {
     return await getCurrentUser()
   } catch (error) {
+    // Silently clear invalid token and return null
+    // This is normal for non-authenticated users
     clearAuthToken()
     return null
   }

@@ -34,9 +34,20 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid - clear cookie
       Cookies.remove(AUTH_TOKEN_COOKIE, { path: '/' });
-      // Redirect to login if needed
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+
+      // Only redirect to login if we're on a protected route
+      // Protected routes: /dashboard, /admin, /checkout
+      if (typeof window !== 'undefined') {
+        const pathname = window.location.pathname;
+        const isProtectedRoute =
+          pathname.startsWith('/dashboard') ||
+          pathname.startsWith('/admin') ||
+          pathname.startsWith('/checkout');
+
+        // Only redirect if on protected route and not already on login page
+        if (isProtectedRoute && !pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
