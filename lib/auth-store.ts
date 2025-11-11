@@ -94,6 +94,7 @@ export const useAuthStore = create<AuthStore>()(
           const user = await verifyToken();
           set({ user, loading: false, error: null });
         } catch (error) {
+          // Silently fail - user is not authenticated, which is fine for public pages
           set({ user: null, loading: false, error: null });
         }
       },
