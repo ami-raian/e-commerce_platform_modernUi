@@ -185,9 +185,7 @@ export const OrderConfirmationEmail = ({
                 <Text style={summaryLabel}>Tax:</Text>
               </Column>
               <Column align="right">
-                <Text style={summaryValue}>
-                  ৳{tax.toLocaleString("en-BD")}
-                </Text>
+                <Text style={summaryValue}>৳{tax.toLocaleString("en-BD")}</Text>
               </Column>
             </Row>
 
@@ -211,9 +209,7 @@ export const OrderConfirmationEmail = ({
                 <Text style={totalLabel}>Total:</Text>
               </Column>
               <Column align="right">
-                <Text style={totalValue}>
-                  ৳{total.toLocaleString("en-BD")}
-                </Text>
+                <Text style={totalValue}>৳{total.toLocaleString("en-BD")}</Text>
               </Column>
             </Row>
           </Section>
@@ -250,9 +246,7 @@ export const OrderConfirmationEmail = ({
             <Text style={footerText}>
               If you have any questions about your order, please contact us.
             </Text>
-            <Text style={footerText}>
-              Customer Support: 01712-XXXXXX
-            </Text>
+            <Text style={footerText}>Customer Support: 01712-XXXXXX</Text>
             <Text style={footerText}>Thank you for shopping with us! 🎉</Text>
           </Section>
         </Container>

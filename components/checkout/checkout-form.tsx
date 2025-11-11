@@ -4,16 +4,30 @@ import type React from "react";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCartStore } from "@/lib/cart-store";
+import { useCartStore, type CartItem } from "@/lib/cart-store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 interface CheckoutFormProps {
   total: number;
+  cartItems: CartItem[];
+  subtotal: number;
+  promoDiscount: number;
+  appliedPromoCode?: string;
+  tax: number;
+  shipping: number;
 }
 
-export function CheckoutForm({ total }: CheckoutFormProps) {
+export function CheckoutForm({
+  total,
+  cartItems,
+  subtotal,
+  promoDiscount,
+  appliedPromoCode,
+  tax,
+  shipping,
+}: CheckoutFormProps) {
   const router = useRouter();
   const clearCart = useCartStore((state) => state.clearCart);
   const [formData, setFormData] = useState({
@@ -29,6 +43,7 @@ export function CheckoutForm({ total }: CheckoutFormProps) {
   const [selectedPayment, setSelectedPayment] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,7 +72,7 @@ export function CheckoutForm({ total }: CheckoutFormProps) {
     // { id: "sendmoney", name: "Send Money", number: "01612-345678", logo: "📱" },
   ];
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!selectedPayment) {
       toast.error("Please select a payment method");
       return;
@@ -66,20 +81,72 @@ export function CheckoutForm({ total }: CheckoutFormProps) {
     const paymentMethod = mobileMoneyOptions.find(
       (opt) => opt.id === selectedPayment
     );
-    toast.success(
-      `Order placed successfully! Please send ৳${total.toLocaleString(
-        "en-BD"
-      )} to ${paymentMethod?.name} number: ${paymentMethod?.number}`,
-      {
-        duration: 5000,
-      }
-    );
+
+    if (!paymentMethod) {
+      toast.error("Invalid payment method selected");
+      return;
+    }
 
     setOrderPlaced(true);
-    setTimeout(() => {
-      clearCart();
-      router.push("/");
-    }, 2000);
+    setSendingEmail(true);
+
+    try {
+      // Send order confirmation email
+      const emailResponse = await fetch("/api/send-order-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerName: customerName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          cartItems: cartItems,
+          subtotal: subtotal,
+          promoDiscount: promoDiscount,
+          appliedPromoCode: appliedPromoCode,
+          tax: tax,
+          shipping: shipping,
+          total: total,
+          paymentMethod: paymentMethod.name,
+          paymentNumber: paymentMethod.number,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        const errorData = await emailResponse.json();
+        console.error("Email sending failed:", errorData);
+        toast.warning(
+          "Order placed but email notification failed. We'll contact you shortly.",
+          { duration: 5000 }
+        );
+      } else {
+        toast.success(
+          `Order placed successfully! Check your email for confirmation. Please send ৳${total.toLocaleString(
+            "en-BD"
+          )} to ${paymentMethod.name}: ${paymentMethod.number}`,
+          {
+            duration: 6000,
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast.warning(
+        "Order placed but email notification failed. We'll contact you shortly.",
+        { duration: 5000 }
+      );
+    } finally {
+      setSendingEmail(false);
+      setTimeout(() => {
+        clearCart();
+        router.push("/");
+      }, 2000);
+    }
   };
 
   return (
@@ -263,10 +330,14 @@ export function CheckoutForm({ total }: CheckoutFormProps) {
 
             <button
               onClick={handlePlaceOrder}
-              disabled={orderPlaced}
+              disabled={orderPlaced || sendingEmail}
               className="w-full btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {orderPlaced ? "Order Placed Successfully!" : "Place Order"}
+              {sendingEmail
+                ? "Sending confirmation email..."
+                : orderPlaced
+                ? "Order Placed Successfully!"
+                : "Place Order"}
             </button>
 
             <div className="text-center text-sm text-muted-foreground">
