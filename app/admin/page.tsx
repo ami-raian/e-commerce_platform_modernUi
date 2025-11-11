@@ -231,14 +231,16 @@ export default function AdminDashboard() {
               <AlertTriangle className="h-5 w-5 text-red-500" />
               Delete Product
             </DialogTitle>
-            <DialogDescription className="space-y-2">
-              <p>
-                Are you sure you want to delete{" "}
-                <span className="font-semibold">{productToDelete?.name}</span>?
-              </p>
-              <p className="text-sm">
-                Choose how you want to delete this product:
-              </p>
+            <DialogDescription asChild>
+              <div className="space-y-2">
+                <div>
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold">{productToDelete?.name}</span>?
+                </div>
+                <div className="text-sm">
+                  Choose how you want to delete this product:
+                </div>
+              </div>
             </DialogDescription>
           </DialogHeader>
 
