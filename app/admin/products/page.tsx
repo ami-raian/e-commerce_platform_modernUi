@@ -423,8 +423,8 @@ function ProductForm({
           {submitting
             ? "Saving..."
             : product
-            ? "Update Product"
-            : "Create Product"}
+              ? "Update Product"
+              : "Create Product"}
         </Button>
       </DialogFooter>
     </form>
