@@ -41,20 +41,24 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    const result = register(
-      formData.email,
-      formData.password,
-      formData.name,
-      "user"
-    );
 
-    if (result.success) {
-      router.push("/dashboard");
-    } else {
-      setError(result.error || "Registration failed");
+    try {
+      const result = await register(
+        formData.email,
+        formData.password,
+        formData.name
+      );
+
+      if (result.success) {
+        router.push("/dashboard");
+      } else {
+        setError(result.error || "Registration failed");
+      }
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

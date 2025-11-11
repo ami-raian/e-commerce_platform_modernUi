@@ -11,10 +11,18 @@ import {
 } from "lucide-react";
 import { FlashSaleBanner } from "@/components/flash-sale/flash-sale-banner";
 import { ProductCard } from "@/components/products/product-card";
-import { mockProducts } from "@/lib/mock-products";
+import { getBestsellers, getImageUrl } from "@/lib/api";
 
-export default function HomePage() {
-  const featuredProducts = mockProducts.slice(0, 4);
+export default async function HomePage() {
+  // Fetch bestsellers from the backend API
+  let featuredProducts: any[] = [];
+  try {
+    featuredProducts = await getBestsellers(4);
+  } catch (error) {
+    console.error("Failed to fetch featured products:", error);
+    // Fallback to empty array if API fails
+    featuredProducts = [];
+  }
 
   return (
     <div className="overflow-hidden">
@@ -175,22 +183,28 @@ export default function HomePage() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product, index) => (
-            <div
-              key={product._id}
-              className="transform hover:scale-105 transition-transform duration-300"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <ProductCard
-                id={product._id}
-                name={product.name}
-                price={product.price}
-                image={product.image}
-                category={product.category}
-                rating={product.rating}
-              />
+          {featuredProducts.length > 0 ? (
+            featuredProducts.map((product, index) => (
+              <div
+                key={product._id}
+                className="transform hover:scale-105 transition-transform duration-300"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <ProductCard
+                  id={product._id}
+                  name={product.name}
+                  price={product.price}
+                  image={getImageUrl(product.images[0])}
+                  category={product.category}
+                  rating={product.rating}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12 text-muted-foreground">
+              <p>Loading products...</p>
             </div>
-          ))}
+          )}
         </div>
         <div className="text-center mt-12">
           <Link

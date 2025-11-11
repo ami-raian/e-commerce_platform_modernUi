@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react"
 import { useTheme } from "@/components/providers/theme-provider"
 import { useCartStore } from "@/lib/cart-store"
@@ -12,6 +12,7 @@ import { useAuthStore } from "@/lib/auth-store"
 
 export function Navbar() {
   const router = useRouter()
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -20,6 +21,14 @@ export function Navbar() {
   const items = useCartStore((state) => state.items)
   const cartCount = items.reduce((total, item) => total + item.quantity, 0)
   const user = useAuthStore((state) => state.user)
+
+  // Check if a route is active
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return pathname === "/"
+    }
+    return pathname?.startsWith(path)
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -43,13 +52,34 @@ export function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/products" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products"
+            className={`transition-colors font-medium ${
+              isActive("/products")
+                ? "text-primary border-b-2 border-primary pb-1"
+                : "text-foreground hover:text-primary"
+            }`}
+          >
             Products
           </Link>
-          <Link href="/categories" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/categories"
+            className={`transition-colors font-medium ${
+              isActive("/categories")
+                ? "text-primary border-b-2 border-primary pb-1"
+                : "text-foreground hover:text-primary"
+            }`}
+          >
             Categories
           </Link>
-          <Link href="/about" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/about"
+            className={`transition-colors font-medium ${
+              isActive("/about")
+                ? "text-primary border-b-2 border-primary pb-1"
+                : "text-foreground hover:text-primary"
+            }`}
+          >
             About
           </Link>
         </div>
@@ -73,7 +103,14 @@ export function Navbar() {
             {mounted ? (theme === "light" ? <Moon size={20} /> : <Sun size={20} />) : <Moon size={20} />}
           </button>
 
-          <Link href="/cart" className="p-2 hover:bg-accent rounded-lg transition-colors relative text-foreground">
+          <Link
+            href="/cart"
+            className={`p-2 rounded-lg transition-colors relative ${
+              isActive("/cart")
+                ? "bg-accent text-primary"
+                : "text-foreground hover:bg-accent"
+            }`}
+          >
             <ShoppingCart size={20} />
             {mounted && cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
@@ -84,11 +121,25 @@ export function Navbar() {
 
           {/* Auth Links */}
           {mounted && user ? (
-            <Link href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
+            <Link
+              href="/dashboard"
+              className={`transition-colors font-medium ${
+                isActive("/dashboard") || isActive("/admin")
+                  ? "text-primary font-semibold"
+                  : "text-foreground hover:text-primary"
+              }`}
+            >
               {user.name.split(" ")[0]}
             </Link>
           ) : (
-            <Link href="/login" className="btn-primary text-center px-4 py-2 text-sm">
+            <Link
+              href="/login"
+              className={`text-center px-4 py-2 text-sm ${
+                isActive("/login") || isActive("/register")
+                  ? "btn-primary opacity-90"
+                  : "btn-primary"
+              }`}
+            >
               Sign In
             </Link>
           )}
@@ -129,23 +180,59 @@ export function Navbar() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden border-t border-border p-4 flex flex-col gap-4">
-          <Link href="/products" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products"
+            className={`transition-colors font-medium ${
+              isActive("/products")
+                ? "text-primary font-semibold"
+                : "text-foreground hover:text-primary"
+            }`}
+            onClick={() => setIsOpen(false)}
+          >
             Products
           </Link>
-          <Link href="/categories" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/categories"
+            className={`transition-colors font-medium ${
+              isActive("/categories")
+                ? "text-primary font-semibold"
+                : "text-foreground hover:text-primary"
+            }`}
+            onClick={() => setIsOpen(false)}
+          >
             Categories
           </Link>
-          <Link href="/about" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/about"
+            className={`transition-colors font-medium ${
+              isActive("/about")
+                ? "text-primary font-semibold"
+                : "text-foreground hover:text-primary"
+            }`}
+            onClick={() => setIsOpen(false)}
+          >
             About
           </Link>
           {mounted && user ? (
             <>
-              <Link href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
+              <Link
+                href="/dashboard"
+                className={`transition-colors font-medium ${
+                  isActive("/dashboard")
+                    ? "text-primary font-semibold"
+                    : "text-foreground hover:text-primary"
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
                 My Dashboard
               </Link>
             </>
           ) : (
-            <Link href="/login" className="btn-primary text-center">
+            <Link
+              href="/login"
+              className="btn-primary text-center"
+              onClick={() => setIsOpen(false)}
+            >
               Sign In
             </Link>
           )}

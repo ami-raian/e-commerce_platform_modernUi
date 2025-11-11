@@ -1,14 +1,29 @@
 "use client";
 
 import { ProductCard } from "@/components/products/product-card";
-import { mockProducts } from "@/lib/mock-products";
 import { Zap, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useProductStore } from "@/lib/product-store";
+import { getImageUrl } from "@/lib/api";
 
 export default function FlashSalePage() {
-  const flashSaleProducts = mockProducts.filter(
-    (product: any) => product.isFlashSale && product.discount > 0
-  );
+  const { fetchFlashSaleProducts } = useProductStore();
+  const [flashSaleProducts, setFlashSaleProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadFlashSales = async () => {
+      try {
+        const products = await fetchFlashSaleProducts();
+        setFlashSaleProducts(products);
+      } catch (error) {
+        console.error("Failed to fetch flash sale products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFlashSales();
+  }, [fetchFlashSaleProducts]);
 
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({
@@ -82,7 +97,11 @@ export default function FlashSalePage() {
         </div>
 
         {/* Products Grid */}
-        {flashSaleProducts.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-xl text-muted-foreground">Loading flash sale products...</p>
+          </div>
+        ) : flashSaleProducts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {flashSaleProducts.map((product: any) => {
               const discountedPrice = calculateDiscountedPrice(product.price, product.discount);
@@ -97,7 +116,7 @@ export default function FlashSalePage() {
                       id={product._id}
                       name={product.name}
                       price={discountedPrice}
-                      image={product.image}
+                      image={getImageUrl(product.images[0])}
                       category={product.category}
                       rating={product.rating}
                     />

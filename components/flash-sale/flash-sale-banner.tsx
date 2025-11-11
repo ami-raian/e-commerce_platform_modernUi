@@ -7,9 +7,14 @@ import { mockFlashSales } from "@/lib/mock-promos"
 export function FlashSaleBanner() {
   const [activeFlashSale, setActiveFlashSale] = useState(mockFlashSales.find((s) => s.active))
   const [timeLeft, setTimeLeft] = useState("")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    if (!activeFlashSale) return
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!activeFlashSale || !mounted) return
 
     const updateTimer = () => {
       const now = new Date()
@@ -32,9 +37,9 @@ export function FlashSaleBanner() {
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
-  }, [activeFlashSale])
+  }, [activeFlashSale, mounted])
 
-  if (!activeFlashSale) return null
+  if (!activeFlashSale || !mounted) return null
 
   return (
     <div className="bg-primary text-white rounded-lg p-4 md:p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
