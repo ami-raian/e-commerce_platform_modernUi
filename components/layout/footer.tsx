@@ -8,9 +8,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <h3 className="font-serif text-2xl font-bold mb-4 text-foreground">marqenbd</h3>
+            <h3 className="font-serif text-2xl font-bold mb-4 text-foreground">Marqen</h3>
             <p className="text-sm">
-              Premium e-commerce platform with smooth animations and modern design.
+              Your destination for trendy and comfortable clothing. Quality fashion for everyone, delivered with care across Bangladesh.
             </p>
             {/* Social Media Links */}
             <div className="flex gap-4 mt-4">
@@ -114,7 +114,7 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-          <p>&copy; 2025 marqenbd. All rights reserved.</p>
+          <p>&copy; 2025 Marqen. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <Link href="/privacy" className="hover:text-primary transition-colors">
               Privacy Policy

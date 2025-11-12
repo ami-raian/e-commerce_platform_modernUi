@@ -55,7 +55,7 @@ export function Navbar() {
                   ? "/dark-mode-logo.png"
                   : "/light-mode-logo.png"
               }
-              alt="marqenbd"
+              alt="Marqen"
               width={150}
               height={50}
               priority

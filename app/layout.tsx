@@ -18,9 +18,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "marqenbd - Premium E-Commerce Bangladesh",
+  title: "Marqen - Premium Clothing Bangladesh",
   description:
-    "Discover premium products in Bangladesh with smooth shopping experience and modern design. Cash on Delivery available.",
+    "Shop trendy t-shirts, pants, and stylish clothing for men and women at Marqen. Quality fashion delivered across Bangladesh with Cash on Delivery.",
   generator: "v0.app",
   icons: {
     icon: "/favicon.ico",
