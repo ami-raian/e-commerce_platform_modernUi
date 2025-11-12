@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react"
 import { useTheme } from "@/components/providers/theme-provider"
@@ -46,8 +47,17 @@ export function Navbar() {
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-50">
       <div className="container-xl flex items-center justify-between py-4">
-        <Link href="/" className="text-2xl font-serif font-bold text-primary">
-          ShopHub
+        <Link href="/" className="flex items-center">
+          {mounted && (
+            <Image
+              src={theme === "dark" ? "/dark-mode-logo.png" : "/light-mode-logo.png"}
+              alt="marqenbd"
+              width={150}
+              height={50}
+              priority
+              className="h-10 w-auto"
+            />
+          )}
         </Link>
 
         {/* Desktop Menu */}

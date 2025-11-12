@@ -8,6 +8,7 @@ import { ProgressBarProvider } from "@/components/providers/progress-bar-provide
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -17,10 +18,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "ShopHub - Premium E-Commerce Bangladesh",
+  title: "marqenbd - Premium E-Commerce Bangladesh",
   description:
     "Discover premium products in Bangladesh with smooth shopping experience and modern design. Cash on Delivery available.",
   generator: "v0.app",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -42,6 +46,7 @@ export default function RootLayout({
             <Navbar />
             <main className="min-h-screen">{children}</main>
             <Footer />
+            <WhatsAppFloat />
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
