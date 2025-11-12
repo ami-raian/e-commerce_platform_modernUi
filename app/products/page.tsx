@@ -102,7 +102,8 @@ function ProductsContent() {
     updateURLParams(selectedCategory, selectedSubCategory, sort);
   };
 
-  const categories = ["all", "fashion", "electronics", "home", "beauty"];
+  // const categories = ["all", "fashion", "electronics", "home", "beauty"];
+  const categories = ["all", "fashion"];
   const fashionSubCategories = [
     { value: "all", label: "All Fashion" },
     { value: "gents", label: "Gents" },
