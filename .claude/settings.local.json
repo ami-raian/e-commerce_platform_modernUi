@@ -11,7 +11,8 @@
       "Bash(timeout /t 10)",
       "Bash(nul)",
       "Bash(dir /s /b \"C:\\Users\\Rai_An\\Documents\\GitHub\\e-commerce-platform-modernUi\")",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(copy:*)"
     ],
     "deny": [],
     "ask": []

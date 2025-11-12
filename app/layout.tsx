@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   description:
     "Discover premium products in Bangladesh with smooth shopping experience and modern design. Cash on Delivery available.",
   generator: "v0.app",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
