@@ -1,48 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { useRouter, usePathname } from "next/navigation"
-import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react"
-import { useTheme } from "@/components/providers/theme-provider"
-import { useCartStore } from "@/lib/cart-store"
-import { useAuthStore } from "@/lib/auth-store"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
+import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react";
+import { useTheme } from "@/components/providers/theme-provider";
+import { useCartStore } from "@/lib/cart-store";
+import { useAuthStore } from "@/lib/auth-store";
 
 export function Navbar() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [mounted, setMounted] = useState(false)
-  const { theme, toggleTheme } = useTheme()
-  const items = useCartStore((state) => state.items)
-  const cartCount = items.reduce((total, item) => total + item.quantity, 0)
-  const user = useAuthStore((state) => state.user)
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const items = useCartStore((state) => state.items);
+  const cartCount = items.reduce((total, item) => total + item.quantity, 0);
+  const user = useAuthStore((state) => state.user);
 
   // Check if a route is active
   const isActive = (path: string) => {
     if (path === "/") {
-      return pathname === "/"
+      return pathname === "/";
     }
-    return pathname?.startsWith(path)
-  }
+    return pathname?.startsWith(path);
+  };
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
-      setSearchQuery("")
-      setShowSearch(false)
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+      setShowSearch(false);
     }
-  }
+  };
 
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-50">
@@ -50,7 +50,11 @@ export function Navbar() {
         <Link href="/" className="flex items-center">
           {mounted && (
             <Image
-              src={theme === "dark" ? "/dark-mode-logo.png" : "/light-mode-logo.png"}
+              src={
+                theme === "dark"
+                  ? "/dark-mode-logo.png"
+                  : "/light-mode-logo.png"
+              }
               alt="marqenbd"
               width={150}
               height={50}
@@ -110,7 +114,15 @@ export function Navbar() {
             className="p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
             aria-label="Toggle theme"
           >
-            {mounted ? (theme === "light" ? <Moon size={20} /> : <Sun size={20} />) : <Moon size={20} />}
+            {mounted ? (
+              theme === "light" ? (
+                <Moon size={20} />
+              ) : (
+                <Sun size={20} />
+              )
+            ) : (
+              <Moon size={20} />
+            )}
           </button>
 
           <Link
@@ -130,7 +142,7 @@ export function Navbar() {
           </Link>
 
           {/* Auth Links */}
-          {mounted && user ? (
+          {/* {mounted && user ? (
             <Link
               href="/dashboard"
               className={`transition-colors font-medium ${
@@ -152,7 +164,7 @@ export function Navbar() {
             >
               Sign In
             </Link>
-          )}
+          )} */}
 
           {/* Mobile Menu Button */}
           <button
@@ -168,7 +180,10 @@ export function Navbar() {
       {/* Search Modal */}
       {showSearch && (
         <div className="border-t border-border p-3 bg-card">
-          <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex gap-2">
+          <form
+            onSubmit={handleSearch}
+            className="max-w-2xl mx-auto flex gap-2"
+          >
             <input
               type="text"
               value={searchQuery}
@@ -177,10 +192,17 @@ export function Navbar() {
               autoFocus
               className="flex-1 px-3 py-1.5 text-sm border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <button type="submit" className="px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity">
+            <button
+              type="submit"
+              className="px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity"
+            >
               Search
             </button>
-            <button type="button" onClick={() => setShowSearch(false)} className="px-4 py-1.5 text-sm border-2 border-primary text-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors">
+            <button
+              type="button"
+              onClick={() => setShowSearch(false)}
+              className="px-4 py-1.5 text-sm border-2 border-primary text-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
               Cancel
             </button>
           </form>
@@ -223,7 +245,7 @@ export function Navbar() {
           >
             About
           </Link>
-          {mounted && user ? (
+          {/* {mounted && user ? (
             <>
               <Link
                 href="/dashboard"
@@ -245,9 +267,9 @@ export function Navbar() {
             >
               Sign In
             </Link>
-          )}
+          )} */}
         </div>
       )}
     </nav>
-  )
+  );
 }
