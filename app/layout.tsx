@@ -8,6 +8,7 @@ import { ProgressBarProvider } from "@/components/providers/progress-bar-provide
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -42,6 +43,7 @@ export default function RootLayout({
             <Navbar />
             <main className="min-h-screen">{children}</main>
             <Footer />
+            <WhatsAppFloat />
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
