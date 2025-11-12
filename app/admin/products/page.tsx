@@ -365,11 +365,11 @@ function ProductForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="electronics">Electronics</SelectItem>
+                {/* <SelectItem value="electronics">Electronics</SelectItem> */}
                 <SelectItem value="fashion">Fashion</SelectItem>
-                <SelectItem value="beauty">Beauty</SelectItem>
+                {/* <SelectItem value="beauty">Beauty</SelectItem>
                 <SelectItem value="accessories">Accessories</SelectItem>
-                <SelectItem value="home">Home</SelectItem>
+                <SelectItem value="home">Home</SelectItem> */}
               </SelectContent>
             </Select>
           </div>

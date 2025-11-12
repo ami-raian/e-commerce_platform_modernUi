@@ -85,7 +85,7 @@ export function ProductForm({
           name: "",
           description: "",
           price: 0,
-          category: "electronics",
+          category: "fashion",
           subCategory: null,
           gender: null,
           stock: 0,
@@ -218,7 +218,10 @@ export function ProductForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, onError)}
+        className="space-y-6"
+      >
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Product Name */}
@@ -283,11 +286,11 @@ export function ProductForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="electronics">Electronics</SelectItem>
+                    {/* <SelectItem value="electronics">Electronics</SelectItem> */}
                     <SelectItem value="fashion">Fashion</SelectItem>
-                    <SelectItem value="beauty">Beauty</SelectItem>
+                    {/* <SelectItem value="beauty">Beauty</SelectItem>
                     <SelectItem value="accessories">Accessories</SelectItem>
-                    <SelectItem value="home">Home</SelectItem>
+                    <SelectItem value="home">Home</SelectItem> */}
                   </SelectContent>
                 </Select>
                 <FormMessage />
