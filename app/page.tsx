@@ -219,7 +219,7 @@ export default async function HomePage() {
 
       {/* CTA Section - Enhanced */}
       <section className="container-xl mb-16">
-        <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary via-purple-600 to-pink-600 text-white p-12 md:p-20">
+        <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary via-primary to-orange-700 text-white p-12 md:p-20">
           <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
           <div className="relative text-center space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium">
