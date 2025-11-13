@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     // Send email to admin (marqenbd@gmail.com)
     const adminEmailResult = await resend.emails.send({
       from: "Marqen Contact Form <onboarding@resend.dev>",
-      to: ["ami.robirai@gmail.com"],
+      to: ["marqenbd@gmail.com"],
       replyTo: contactData.email,
       subject: `Contact Form: ${contactData.subject}`,
       react: ContactFormEmail({

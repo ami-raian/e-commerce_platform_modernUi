@@ -63,10 +63,10 @@ export async function POST(req: NextRequest) {
       minute: "2-digit",
     });
 
-    // Send email to admin (ami.robirai@gmail.com)
+    // Send email to admin (marqenbd@gmail.com)
     const adminEmailResult = await resend.emails.send({
       from: "E-Commerce Store <onboarding@resend.dev>", // Change this to your verified domain
-      to: ["ami.robirai@gmail.com"],
+      to: ["marqenbd@gmail.com"],
       subject: `New Order from ${orderData.customerName}`,
       react: OrderConfirmationEmail({
         ...orderData,
