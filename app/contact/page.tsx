@@ -8,14 +8,41 @@ import { Mail, Phone, MapPin } from "lucide-react"
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" })
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => {
+    setIsSubmitting(true)
+    setError("")
+
+    try {
+      const response = await fetch("/api/send-contact-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message")
+      }
+
+      setSubmitted(true)
       setFormData({ name: "", email: "", subject: "", message: "" })
-      setSubmitted(false)
-    }, 3000)
+
+      setTimeout(() => {
+        setSubmitted(false)
+      }, 5000)
+    } catch (err: any) {
+      console.error("Error sending contact form:", err)
+      setError(err.message || "Failed to send message. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -88,12 +115,21 @@ export default function ContactPage() {
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
             </div>
-            <button type="submit" className="w-full btn-primary py-3">
-              Send Message
+            <button
+              type="submit"
+              className="w-full btn-primary py-3"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Sending..." : "Send Message"}
             </button>
             {submitted && (
               <p className="text-center text-green-600 font-medium">
                 Message sent successfully! We'll get back to you soon.
+              </p>
+            )}
+            {error && (
+              <p className="text-center text-red-600 font-medium">
+                {error}
               </p>
             )}
           </form>
