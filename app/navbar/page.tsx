@@ -15,7 +15,7 @@ export default function Navbar() {
     <nav className="bg-background border-b border-border sticky top-0 z-50">
       <div className="container-xl flex items-center justify-between py-4">
         <Link href="/" className="text-2xl font-serif font-bold text-primary">
-          ShopHub
+          Marqen
         </Link>
 
         {/* Desktop Menu */}

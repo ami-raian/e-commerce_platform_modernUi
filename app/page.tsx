@@ -164,9 +164,9 @@ export default async function HomePage() {
       </section>
 
       {/* Flash Sales Banner */}
-      <section className="container-xl py-12">
+      {/* <section className="container-xl py-12">
         <FlashSaleBanner />
-      </section>
+      </section> */}
 
       {/* Featured Products Section */}
       <section className="container-xl py-16 md:py-24">

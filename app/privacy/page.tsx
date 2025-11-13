@@ -7,7 +7,7 @@ export default function PrivacyPage() {
         <div className="card">
           <h2 className="text-xl font-semibold mb-4">Introduction</h2>
           <p className="text-muted-foreground leading-relaxed">
-            ShopHub values your privacy. This privacy policy explains how we collect, use, disclose, and safeguard your
+            Marqen values your privacy. This privacy policy explains how we collect, use, disclose, and safeguard your
             information when you visit our website.
           </p>
         </div>
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
         <div className="card">
           <h2 className="text-xl font-semibold mb-4">Contact Us</h2>
           <p className="text-muted-foreground leading-relaxed">
-            If you have any questions about this privacy policy, please contact us at hello@shophub.com.
+            If you have any questions about this privacy policy, please contact us at marqenbd@gmail.com.
           </p>
         </div>
       </div>

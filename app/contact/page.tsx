@@ -27,21 +27,21 @@ export default function ContactPage() {
           <div className="card text-center">
             <Mail className="w-8 h-8 text-primary mx-auto mb-3" />
             <h3 className="font-semibold mb-2">Email</h3>
-            <a href="mailto:hello@shophub.com" className="text-primary hover:underline">
-              hello@shophub.com
+            <a href="mailto:marqenbd@gmail.com" className="text-primary hover:underline">
+              marqenbd@gmail.com
             </a>
           </div>
           <div className="card text-center">
             <Phone className="w-8 h-8 text-primary mx-auto mb-3" />
             <h3 className="font-semibold mb-2">Phone</h3>
-            <a href="tel:+1234567890" className="text-primary hover:underline">
-              +1 (234) 567-890
+            <a href="tel:+8801650278889" className="text-primary hover:underline">
+              +880 1650-278889
             </a>
           </div>
           <div className="card text-center">
             <MapPin className="w-8 h-8 text-primary mx-auto mb-3" />
             <h3 className="font-semibold mb-2">Address</h3>
-            <p className="text-muted-foreground">New York, USA</p>
+            <p className="text-muted-foreground">Daffodil Smart City, Ashulia, Dhaka-1216</p>
           </div>
         </div>
 

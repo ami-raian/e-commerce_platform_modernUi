@@ -25,8 +25,8 @@ export default function BlogPage() {
 
   return (
     <div className="container-xl py-16">
-      <h1 className="section-title mb-4">ShopHub Blog</h1>
-      <p className="text-lg text-muted-foreground mb-12">Tips, trends, and insights from the ShopHub team</p>
+      <h1 className="section-title mb-4">Marqen Blog</h1>
+      <p className="text-lg text-muted-foreground mb-12">Fashion tips, trends, and style insights from the Marqen team</p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {posts.map((post) => (

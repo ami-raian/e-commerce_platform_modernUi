@@ -35,7 +35,7 @@ export const mockPromoCodes = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-]
+];
 
 export const mockFlashSales = [
   {
@@ -71,4 +71,4 @@ export const mockFlashSales = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-]
+];
