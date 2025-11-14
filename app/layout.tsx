@@ -25,6 +25,31 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  openGraph: {
+    title: "Marqen - Premium Clothing Bangladesh",
+    description:
+      "Shop trendy t-shirts, pants, and stylish clothing for men and women at Marqen. Quality fashion delivered across Bangladesh with Cash on Delivery.",
+    url: "https://www.marqenbd.com",
+    siteName: "Marqen",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Marqen - Premium Clothing Bangladesh",
+    description:
+      "Shop trendy t-shirts, pants, and stylish clothing for men and women at Marqen. Quality fashion delivered across Bangladesh with Cash on Delivery.",
+  },
+  keywords: [
+    "clothing Bangladesh",
+    "t-shirts",
+    "pants",
+    "fashion",
+    "Marqen",
+    "cash on delivery",
+    "men's clothing",
+    "women's clothing",
+  ],
 };
 
 export default function RootLayout({
