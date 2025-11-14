@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  verification: {
+    google: "Upg29v-LAQWZWqGlXE0bsuAsmHliLFK48WDVD2Smgw0",
+  },
   openGraph: {
     title: "Marqen - Premium Clothing Bangladesh",
     description:
@@ -76,6 +79,40 @@ export default function RootLayout({
                 } catch (e) {}
               })();
             `,
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ClothingStore",
+              name: "Marqen",
+              description:
+                "Premium clothing store in Bangladesh offering trendy t-shirts, pants, and stylish clothing for men and women with Cash on Delivery.",
+              url: "https://www.marqenbd.com",
+              logo: "https://www.marqenbd.com/light-mode-logo.png",
+              image: "https://www.marqenbd.com/light-mode-logo.png",
+              telephone: "+880-XXX-XXXXXX",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "BD",
+                addressLocality: "Bangladesh",
+              },
+              priceRange: "$$",
+              currenciesAccepted: "BDT",
+              paymentAccepted: "Cash on Delivery, Credit Card, Debit Card",
+              openingHours: "Mo-Su 00:00-23:59",
+              sameAs: [
+                "https://www.facebook.com/marqenbd",
+                "https://www.instagram.com/marqenbd",
+              ],
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://www.marqenbd.com/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            }),
           }}
         />
       </head>
