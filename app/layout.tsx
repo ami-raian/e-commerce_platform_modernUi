@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "Marqen - Premium Clothing Bangladesh",
   description:
     "Shop trendy t-shirts, pants, and stylish clothing for men and women at Marqen. Quality fashion delivered across Bangladesh with Cash on Delivery.",
-  generator: "v0.app",
+  generator: "next.js",
   icons: {
     icon: "/favicon.ico",
   },
