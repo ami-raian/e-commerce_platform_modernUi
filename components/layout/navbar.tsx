@@ -48,7 +48,26 @@ export function Navbar() {
     <nav className="bg-background border-b border-border sticky top-0 z-50">
       <div className="container-xl flex items-center justify-between py-4">
         <Link href="/" className="flex items-center">
-          {mounted && (
+          {theme === "dark" ? (
+            <Image
+              src="/dark-mode-logo.png"
+              alt="Marqen"
+              height={50}
+              width={50}
+              priority
+              className="h-10 w-auto"
+            />
+          ) : (
+            <Image
+              src="/light-mode-logo.png"
+              alt="Marqen"
+              height={50}
+              width={50}
+              priority
+              className="h-10 w-auto"
+            />
+          )}
+          {/* {mounted && (
             <Image
               src={
                 theme === "dark"
@@ -61,7 +80,7 @@ export function Navbar() {
               priority
               className="h-10 w-auto"
             />
-          )}
+          )} */}
         </Link>
 
         {/* Desktop Menu */}
