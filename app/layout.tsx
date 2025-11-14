@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  verification: {
+    google: "Upg29v-LAQWZWqGlXE0bsuAsmHliLFK48WDVD2Smgw0",
+  },
   openGraph: {
     title: "Marqen - Premium Clothing Bangladesh",
     description:
