@@ -21,10 +21,35 @@ export const metadata: Metadata = {
   title: "Marqen - Premium Clothing Bangladesh",
   description:
     "Shop trendy t-shirts, pants, and stylish clothing for men and women at Marqen. Quality fashion delivered across Bangladesh with Cash on Delivery.",
-  generator: "v0.app",
+  generator: "next.js",
   icons: {
     icon: "/favicon.ico",
   },
+  openGraph: {
+    title: "Marqen - Premium Clothing Bangladesh",
+    description:
+      "Shop trendy t-shirts, pants, and stylish clothing for men and women at Marqen. Quality fashion delivered across Bangladesh with Cash on Delivery.",
+    url: "https://www.marqenbd.com",
+    siteName: "Marqen",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Marqen - Premium Clothing Bangladesh",
+    description:
+      "Shop trendy t-shirts, pants, and stylish clothing for men and women at Marqen. Quality fashion delivered across Bangladesh with Cash on Delivery.",
+  },
+  keywords: [
+    "clothing Bangladesh",
+    "t-shirts",
+    "pants",
+    "fashion",
+    "Marqen",
+    "cash on delivery",
+    "men's clothing",
+    "women's clothing",
+  ],
 };
 
 export default function RootLayout({
@@ -34,6 +59,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedTheme = localStorage.getItem('theme');
+                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${playfair.variable}`}
         suppressHydrationWarning

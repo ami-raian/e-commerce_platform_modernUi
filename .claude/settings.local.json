@@ -12,7 +12,8 @@
       "Bash(nul)",
       "Bash(dir /s /b \"C:\\Users\\Rai_An\\Documents\\GitHub\\e-commerce-platform-modernUi\")",
       "Bash(findstr:*)",
-      "Bash(copy:*)"
+      "Bash(copy:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

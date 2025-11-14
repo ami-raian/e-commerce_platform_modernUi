@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { CheckCircle } from "lucide-react"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { CheckCircle } from "lucide-react";
 
 export default function OrderConfirmationPage() {
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  if (!mounted) return null
+  if (!mounted) return null;
 
-  const orderNumber = `ORD-${Date.now().toString().slice(-8)}`
+  const orderNumber = `ORD-${Date.now().toString().slice(-8)}`;
 
   return (
     <div className="container-xl py-16 md:py-24">
@@ -24,7 +24,9 @@ export default function OrderConfirmationPage() {
 
         <div>
           <h1 className="section-title mb-2">Order Confirmed</h1>
-          <p className="text-lg text-muted-foreground">Thank you for your purchase!</p>
+          <p className="text-lg text-muted-foreground">
+            Thank you for your purchase!
+          </p>
         </div>
 
         <div className="card bg-accent">
@@ -33,7 +35,10 @@ export default function OrderConfirmationPage() {
         </div>
 
         <div className="space-y-3 text-muted-foreground">
-          <p>We've sent a confirmation email to your inbox with order details and tracking information.</p>
+          <p>
+            We've sent a confirmation email to your inbox with order details and
+            tracking information.
+          </p>
           <p>Your order will be shipped within 2-3 business days.</p>
         </div>
 
@@ -47,5 +52,5 @@ export default function OrderConfirmationPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
