@@ -104,13 +104,18 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-background py-8">
       <div className="container-xl">
         <div>
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-serif font-bold text-primary">
-              Admin Dashboard
-            </h1>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-primary">
+                Admin Dashboard
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Manage your products and inventory
+              </p>
+            </div>
             <button
               onClick={handleAddProduct}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
             >
               <Plus size={20} />
               Add Product
@@ -123,14 +128,30 @@ export default function AdminDashboard() {
               <table className="w-full">
                 <thead className="bg-primary/10 dark:bg-primary/20 border-b border-border">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Image</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Name</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Category</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Stock</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Price</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Discount</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Actions</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Image
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Name
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Category
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Stock
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Price
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Discount
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -154,9 +175,13 @@ export default function AdminDashboard() {
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-medium text-foreground max-w-xs truncate">{product.name}</td>
+                      <td className="px-4 py-3 font-medium text-foreground max-w-xs truncate">
+                        {product.name}
+                      </td>
                       <td className="px-4 py-3">
-                        <span className="capitalize text-sm text-foreground">{product.category}</span>
+                        <span className="capitalize text-sm text-foreground">
+                          {product.category}
+                        </span>
                         {product.subCategory && (
                           <span className="text-xs text-muted-foreground ml-1">
                             ({product.subCategory})
@@ -164,12 +189,20 @@ export default function AdminDashboard() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-foreground">
-                        <span className={product.stock < 10 ? "text-red-600 dark:text-red-400 font-semibold" : ""}>
+                        <span
+                          className={
+                            product.stock < 10
+                              ? "text-red-600 dark:text-red-400 font-semibold"
+                              : ""
+                          }
+                        >
                           {product.stock}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-foreground font-medium">৳{product.price.toLocaleString("en-BD")}</div>
+                        <div className="text-foreground font-medium">
+                          ৳{product.price.toLocaleString("en-BD")}
+                        </div>
                         {product.discountPercent > 0 && (
                           <div className="text-xs text-green-600 dark:text-green-400">
                             Save {product.discountPercent}%
@@ -233,7 +266,7 @@ export default function AdminDashboard() {
               >
                 <div className="flex gap-4">
                   {/* Product Image */}
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {product.images && product.images[0] ? (
                       <Image
                         src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product.images[0]}`}
@@ -251,7 +284,9 @@ export default function AdminDashboard() {
 
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground mb-1 truncate">{product.name}</h3>
+                    <h3 className="font-semibold text-foreground mb-1 truncate">
+                      {product.name}
+                    </h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Category:</span>
@@ -266,14 +301,18 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Stock:</span>
-                        <span className={`font-medium ${product.stock < 10 ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>
+                        <span
+                          className={`font-medium ${product.stock < 10 ? "text-red-600 dark:text-red-400" : "text-foreground"}`}
+                        >
                           {product.stock}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Price:</span>
                         <div className="text-right">
-                          <div className="font-semibold text-foreground">৳{product.price.toLocaleString("en-BD")}</div>
+                          <div className="font-semibold text-foreground">
+                            ৳{product.price.toLocaleString("en-BD")}
+                          </div>
                           {product.discountPercent > 0 && (
                             <div className="text-xs text-green-600 dark:text-green-400">
                               Save {product.discountPercent}%
@@ -329,8 +368,15 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          <div className="mt-6 p-4 bg-accent rounded-lg">
-            <p className="text-sm">Total Products: {products.length}</p>
+          <div className="mt-6 p-4 bg-card border border-border rounded-lg shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-muted-foreground">
+                Total Products
+              </p>
+              <p className="text-2xl font-bold text-primary">
+                {products.length}
+              </p>
+            </div>
           </div>
         </div>
       </div>
