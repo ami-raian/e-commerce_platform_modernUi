@@ -116,6 +116,7 @@ export default function ProductPage({
       quantity,
       image:
         product.images?.[0] ?? (product as any).image ?? "/placeholder.svg",
+      size: selectedSize || undefined,
     });
 
     const sizeInfo = selectedSize ? ` - Size: ${selectedSize}` : "";

@@ -7,13 +7,14 @@ export interface CartItem {
   price: number
   quantity: number
   image: string
+  size?: string
 }
 
 interface CartStore {
   items: CartItem[]
   addItem: (item: CartItem) => void
-  removeItem: (productId: string) => void
-  updateQuantity: (productId: string, quantity: number) => void
+  removeItem: (productId: string, size?: string) => void
+  updateQuantity: (productId: string, size: string | undefined, quantity: number) => void
   clearCart: () => void
   getTotal: () => number
   getItemCount: () => number
@@ -25,23 +26,29 @@ export const useCartStore = create<CartStore>()(
       items: [],
       addItem: (item) =>
         set((state) => {
-          const existingItem = state.items.find((i) => i.productId === item.productId)
+          const existingItem = state.items.find(
+            (i) => i.productId === item.productId && i.size === item.size
+          )
           if (existingItem) {
             return {
               items: state.items.map((i) =>
-                i.productId === item.productId ? { ...i, quantity: i.quantity + item.quantity } : i,
+                i.productId === item.productId && i.size === item.size
+                  ? { ...i, quantity: i.quantity + item.quantity }
+                  : i
               ),
             }
           }
           return { items: [...state.items, item] }
         }),
-      removeItem: (productId) =>
+      removeItem: (productId, size) =>
         set((state) => ({
-          items: state.items.filter((i) => i.productId !== productId),
+          items: state.items.filter((i) => !(i.productId === productId && i.size === size)),
         })),
-      updateQuantity: (productId, quantity) =>
+      updateQuantity: (productId, size, quantity) =>
         set((state) => ({
-          items: state.items.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
+          items: state.items.map((i) =>
+            i.productId === productId && i.size === size ? { ...i, quantity } : i
+          ),
         })),
       clearCart: () => set({ items: [] }),
       getTotal: () => {

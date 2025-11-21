@@ -53,7 +53,7 @@ export default function CartPage() {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
               <CartItemComponent
-                key={item.productId}
+                key={`${item.productId}-${item.size || 'no-size'}`}
                 item={item}
                 onUpdateQuantity={updateQuantity}
                 onRemove={removeItem}
