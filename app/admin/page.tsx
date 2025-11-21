@@ -23,6 +23,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const authLoading = useAuthStore((state) => state.loading);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const products = useProductStore((state) => state.products);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
@@ -32,8 +33,8 @@ export default function AdminDashboard() {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   useEffect(() => {
-    // Wait for auth to finish loading before checking user
-    if (authLoading) return;
+    // Wait for zustand to rehydrate from storage AND auth loading to finish
+    if (!hasHydrated || authLoading) return;
 
     if (!user || user.role !== "admin") {
       router.push("/login");
@@ -41,7 +42,7 @@ export default function AdminDashboard() {
       // Fetch products when admin dashboard loads
       fetchProducts();
     }
-  }, [user, authLoading, router, fetchProducts]);
+  }, [user, authLoading, hasHydrated, router, fetchProducts]);
 
   const handleEdit = (productId: string) => {
     router.push(`/admin/products/${productId}/edit`);
@@ -82,8 +83,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // Show loading spinner while checking authentication
-  if (authLoading) {
+  // Show loading spinner while checking authentication or waiting for rehydration
+  if (!hasHydrated || authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -116,107 +117,216 @@ export default function AdminDashboard() {
             </button>
           </div>
 
-          {/* Products Table */}
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
+          {/* Products Table - Desktop */}
+          <div className="hidden lg:block bg-card border border-border rounded-lg overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-primary text-primary-foreground">
+                <thead className="bg-primary/10 dark:bg-primary/20 border-b border-border">
                   <tr>
-                    <th className="px-6 py-3 text-left">Image</th>
-                    <th className="px-6 py-3 text-left">Name</th>
-                    <th className="px-6 py-3 text-left">Category</th>
-                    <th className="px-6 py-3 text-left">Stock</th>
-                    <th className="px-6 py-3 text-left">Price</th>
-                    <th className="px-6 py-3 text-left">Discount</th>
-                    <th className="px-6 py-3 text-left">Status</th>
-                    <th className="px-6 py-3 text-left">Actions</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Image</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Name</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Category</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Stock</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Price</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Discount</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Status</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border">
                   {products.map((product) => (
                     <tr
                       key={product._id}
-                      className="border-t border-border hover:bg-accent transition-colors"
+                      className="hover:bg-accent/50 transition-colors"
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         {product.images && product.images[0] ? (
                           <Image
                             src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product.images[0]}`}
                             alt={product.name}
                             width={48}
                             height={48}
-                            className="object-cover rounded"
+                            className="object-cover rounded-md border border-border"
                           />
                         ) : (
-                          <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-xs">
+                          <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground border border-border">
                             No Image
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 font-medium">{product.name}</td>
-                      <td className="px-6 py-4">
-                        <span className="capitalize">{product.category}</span>
+                      <td className="px-4 py-3 font-medium text-foreground max-w-xs truncate">{product.name}</td>
+                      <td className="px-4 py-3">
+                        <span className="capitalize text-sm text-foreground">{product.category}</span>
                         {product.subCategory && (
                           <span className="text-xs text-muted-foreground ml-1">
                             ({product.subCategory})
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4">{product.stock}</td>
-                      <td className="px-6 py-4">
-                        <div>
-                          <div>৳{product.price.toLocaleString("en-BD")}</div>
-                          {product.discountPercent > 0 && (
-                            <div className="text-xs text-green-600">
-                              Save {product.discountPercent}%
-                            </div>
-                          )}
-                        </div>
+                      <td className="px-4 py-3 text-foreground">
+                        <span className={product.stock < 10 ? "text-red-600 dark:text-red-400 font-semibold" : ""}>
+                          {product.stock}
+                        </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
+                        <div className="text-foreground font-medium">৳{product.price.toLocaleString("en-BD")}</div>
+                        {product.discountPercent > 0 && (
+                          <div className="text-xs text-green-600 dark:text-green-400">
+                            Save {product.discountPercent}%
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-foreground">
                         {product.discountPercent > 0
                           ? `${product.discountPercent}%`
                           : "-"}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div className="flex flex-col gap-1">
                           <span
-                            className={`text-xs px-2 py-1 rounded ${
+                            className={`text-xs px-2 py-1 rounded-md font-medium inline-block w-fit ${
                               product.isActive
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
+                                ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                                : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-400"
                             }`}
                           >
                             {product.isActive ? "Active" : "Inactive"}
                           </span>
                           {product.isFlashSale && (
-                            <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">
+                            <span className="text-xs px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 font-medium inline-block w-fit">
                               Flash Sale
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 flex gap-2">
-                        <button
-                          onClick={() => handleEdit(product._id)}
-                          className="p-2 hover:bg-blue-500 hover:text-white rounded-lg transition-colors"
-                          title="Edit product"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(product)}
-                          className="p-2 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
-                          title="Delete product"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(product._id)}
+                            className="p-2 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 rounded-lg transition-all duration-200"
+                            title="Edit product"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(product)}
+                            className="p-2 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-lg transition-all duration-200"
+                            title="Delete product"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* Products Cards - Mobile/Tablet */}
+          <div className="lg:hidden space-y-4">
+            {products.map((product) => (
+              <div
+                key={product._id}
+                className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex gap-4">
+                  {/* Product Image */}
+                  <div className="flex-shrink-0">
+                    {product.images && product.images[0] ? (
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product.images[0]}`}
+                        alt={product.name}
+                        width={80}
+                        height={80}
+                        className="object-cover rounded-md border border-border"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground border border-border">
+                        No Image
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground mb-1 truncate">{product.name}</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Category:</span>
+                        <span className="capitalize text-foreground">
+                          {product.category}
+                          {product.subCategory && (
+                            <span className="text-xs text-muted-foreground ml-1">
+                              ({product.subCategory})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Stock:</span>
+                        <span className={`font-medium ${product.stock < 10 ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>
+                          {product.stock}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Price:</span>
+                        <div className="text-right">
+                          <div className="font-semibold text-foreground">৳{product.price.toLocaleString("en-BD")}</div>
+                          {product.discountPercent > 0 && (
+                            <div className="text-xs text-green-600 dark:text-green-400">
+                              Save {product.discountPercent}%
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Badges */}
+                    <div className="flex gap-2 mt-3">
+                      <span
+                        className={`text-xs px-2 py-1 rounded-md font-medium ${
+                          product.isActive
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                            : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-400"
+                        }`}
+                      >
+                        {product.isActive ? "Active" : "Inactive"}
+                      </span>
+                      {product.isFlashSale && (
+                        <span className="text-xs px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 font-medium">
+                          Flash Sale
+                        </span>
+                      )}
+                      {product.discountPercent > 0 && (
+                        <span className="text-xs px-2 py-1 rounded-md bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 font-medium">
+                          {product.discountPercent}% OFF
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 mt-4">
+                      <button
+                        onClick={() => handleEdit(product._id)}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg transition-colors text-sm font-medium"
+                      >
+                        <Edit size={16} />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => openDeleteModal(product)}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors text-sm font-medium"
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="mt-6 p-4 bg-accent rounded-lg">

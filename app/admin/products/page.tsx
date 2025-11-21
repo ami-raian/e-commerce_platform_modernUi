@@ -47,7 +47,7 @@ import { Pencil, Trash2, Plus, Image as ImageIcon } from "lucide-react";
 import { getImageUrl } from "@/lib/api";
 
 export default function AdminProductsPage() {
-  const { user } = useAuthStore();
+  const { user, hasHydrated } = useAuthStore();
   const {
     products,
     loading,
@@ -67,6 +67,16 @@ export default function AdminProductsPage() {
       fetchProducts();
     }
   }, [user, fetchProducts]);
+
+  // Show loading while rehydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto py-12 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   // Redirect if not admin
   if (user?.role !== "admin") {
