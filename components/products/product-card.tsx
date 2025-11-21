@@ -8,7 +8,9 @@ import { toast } from "sonner";
 interface ProductCardProps {
   id: string;
   name: string;
+  mainPrice: number;
   price: number;
+  discountPercent: number;
   image: string;
   category: string;
   rating: number;
@@ -17,7 +19,9 @@ interface ProductCardProps {
 export function ProductCard({
   id,
   name,
+  mainPrice,
   price,
+  discountPercent,
   image,
   category,
   rating,
@@ -47,6 +51,11 @@ export function ProductCard({
             alt={name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
+          {discountPercent > 0 && (
+            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-bold">
+              -{Math.round(discountPercent)}%
+            </div>
+          )}
         </div>
 
         <div className="flex-1 flex flex-col">
@@ -70,9 +79,22 @@ export function ProductCard({
           </div>
 
           <div className="flex items-center justify-between mt-auto">
-            <span className="text-primary font-bold text-lg">
-              ৳{price.toLocaleString("en-BD")}
-            </span>
+            <div className="flex flex-col gap-1">
+              {discountPercent > 0 ? (
+                <>
+                  <span className="text-primary font-bold text-lg">
+                    ৳{price.toLocaleString("en-BD")}
+                  </span>
+                  <span className="text-muted-foreground text-sm line-through">
+                    ৳{mainPrice.toLocaleString("en-BD")}
+                  </span>
+                </>
+              ) : (
+                <span className="text-primary font-bold text-lg">
+                  ৳{price.toLocaleString("en-BD")}
+                </span>
+              )}
+            </div>
             <button
               onClick={(e) => {
                 e.preventDefault();

@@ -166,15 +166,17 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4">
                         <div>
                           <div>৳{product.price.toLocaleString("en-BD")}</div>
-                          {product.discount > 0 && (
+                          {product.discountPercent > 0 && (
                             <div className="text-xs text-green-600">
-                              Save {product.discount}%
+                              Save {product.discountPercent}%
                             </div>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        {product.discount > 0 ? `${product.discount}%` : "-"}
+                        {product.discountPercent > 0
+                          ? `${product.discountPercent}%`
+                          : "-"}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
@@ -235,7 +237,8 @@ export default function AdminDashboard() {
               <div className="space-y-2">
                 <div>
                   Are you sure you want to delete{" "}
-                  <span className="font-semibold">{productToDelete?.name}</span>?
+                  <span className="font-semibold">{productToDelete?.name}</span>
+                  ?
                 </div>
                 <div className="text-sm">
                   Choose how you want to delete this product:
