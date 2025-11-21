@@ -202,7 +202,9 @@ function ProductsContent() {
                   key={product._id}
                   id={product._id}
                   name={product.name}
+                  mainPrice={product.mainPrice}
                   price={product.price}
+                  discountPercent={product.discountPercent}
                   image={getImageUrl(product.images[0])}
                   category={product.category}
                   rating={product.rating}

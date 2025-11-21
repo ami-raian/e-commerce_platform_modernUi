@@ -20,7 +20,9 @@ export interface Product {
   _id: string
   name: string
   description: string
-  price: number
+  mainPrice: number // Original price
+  price: number // Discounted selling price
+  discountPercent: number // Auto-calculated discount percentage
   images: string[] // Array of image URLs (1-5 images)
   category: 'electronics' | 'fashion' | 'beauty' | 'accessories' | 'home'
   subCategory?: 'gents' | 'ladies' | null
@@ -29,9 +31,8 @@ export interface Product {
   rating: number
   reviews: Review[]
   isFlashSale: boolean
-  discount: number
   isActive: boolean
-  discountedPrice?: number // Virtual field
+  sizes: string[] // Default: [] - Allowed: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
   createdAt: string
   updatedAt: string
 }
@@ -65,21 +66,23 @@ export interface ProductFilters {
 export interface CreateProductData {
   name: string
   description: string
-  price: number
+  mainPrice: number // Original price
+  price: number // Discounted selling price
   images?: string[] // URLs or will be uploaded
   category: 'electronics' | 'fashion' | 'beauty' | 'accessories' | 'home'
   subCategory?: 'gents' | 'ladies' | null
   gender?: 'gents' | 'ladies' | 'unisex' | null
   stock: number
   isFlashSale?: boolean
-  discount?: number
   isActive?: boolean
+  sizes?: string[] // Default: [] - Allowed: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
 }
 
 export interface UpdateProductData {
   name?: string
   description?: string
-  price?: number
+  mainPrice?: number // Original price
+  price?: number // Discounted selling price
   images?: string[]
   category?: 'electronics' | 'fashion' | 'beauty' | 'accessories' | 'home'
   subCategory?: 'gents' | 'ladies' | null
@@ -87,8 +90,8 @@ export interface UpdateProductData {
   stock?: number
   rating?: number
   isFlashSale?: boolean
-  discount?: number
   isActive?: boolean
+  sizes?: string[] // Default: [] - Allowed: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
 }
 
 export interface AddReviewData {

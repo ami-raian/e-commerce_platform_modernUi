@@ -3,9 +3,18 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X, Upload, ImageIcon } from "lucide-react";
+import { X, Upload, ImageIcon, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Form,
   FormControl,
@@ -54,6 +63,13 @@ export function ProductForm({
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
+  // Error dialog state
+  const [errorDialog, setErrorDialog] = useState<{
+    open: boolean;
+    title: string;
+    errors: Record<string, string>;
+  }>({ open: false, title: "", errors: {} });
+
   const createProduct = useProductStore((state) => state.createProduct);
   const updateProductWithImages = useProductStore(
     (state) => state.updateProductWithImages
@@ -71,6 +87,7 @@ export function ProductForm({
       ? {
           name: product.name,
           description: product.description,
+          mainPrice: product.mainPrice,
           price: product.price,
           category: product.category,
           subCategory: product.subCategory,
@@ -78,12 +95,13 @@ export function ProductForm({
           stock: product.stock,
           rating: product.rating,
           isFlashSale: product.isFlashSale,
-          discount: product.discount,
           isActive: product.isActive,
+          sizes: product.sizes || [],
         }
       : {
           name: "",
           description: "",
+          mainPrice: 0,
           price: 0,
           category: "fashion",
           subCategory: null,
@@ -91,9 +109,9 @@ export function ProductForm({
           stock: 0,
           rating: 0,
           isFlashSale: false,
-          discount: 0,
           isActive: true,
           images: [],
+          sizes: [],
         },
   });
 
@@ -167,6 +185,9 @@ export function ProductForm({
           return;
         }
 
+        // Ensure sizes is always an array
+        data.sizes = data.sizes || [];
+
         const updatedProduct = await updateProductWithImages(
           product._id,
           data,
@@ -184,6 +205,10 @@ export function ProductForm({
         // Create mode
         console.log("📦 Creating product with data:", data);
         const { images, ...productData } = data;
+
+        // Ensure sizes is always an array
+        productData.sizes = productData.sizes || [];
+
         console.log("📸 Images:", images);
         console.log("📝 Product data:", productData);
 
@@ -202,9 +227,21 @@ export function ProductForm({
       }
     } catch (error: any) {
       console.error("❌ Error submitting form:", error);
-      toast.error(
-        error.message || `Failed to ${isEditMode ? "update" : "create"} product`
-      );
+
+      // Handle backend validation errors
+      if (error.response?.data?.errors) {
+        setErrorDialog({
+          open: true,
+          title: error.response.data.message || "Validation Error",
+          errors: error.response.data.errors,
+        });
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(
+          error.message || `Failed to ${isEditMode ? "update" : "create"} product`
+        );
+      }
     }
   };
 
@@ -217,11 +254,49 @@ export function ProductForm({
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onError)}
-        className="space-y-6"
+    <>
+      {/* Error Dialog */}
+      <AlertDialog
+        open={errorDialog.open}
+        onOpenChange={(open) =>
+          setErrorDialog({ ...errorDialog, open })
+        }
       >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="h-5 w-5" />
+              {errorDialog.title}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 pt-2">
+                {Object.entries(errorDialog.errors).map(([field, message]) => (
+                  <div
+                    key={field}
+                    className="p-3 bg-red-50 border border-red-200 rounded-md"
+                  >
+                    <p className="font-semibold text-red-900 capitalize">
+                      {field}:
+                    </p>
+                    <p className="text-red-700 text-sm">{message as string}</p>
+                  </div>
+                ))}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setErrorDialog({ open: false, title: "", errors: {} })}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit, onError)}
+          className="space-y-6"
+        >
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Product Name */}
@@ -243,13 +318,13 @@ export function ProductForm({
             )}
           />
 
-          {/* Price */}
+          {/* Main Price (Original) */}
           <FormField
             control={form.control}
-            name="price"
+            name="mainPrice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price (৳) *</FormLabel>
+                <FormLabel>Original Price (৳) *</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -263,9 +338,55 @@ export function ProductForm({
                     disabled={loading}
                   />
                 </FormControl>
+                <FormDescription>
+                  The original price before discount
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
+          />
+
+          {/* Selling Price (Discounted) */}
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => {
+              const mainPrice = form.watch("mainPrice");
+              const price = field.value || 0;
+              const calculatedDiscount =
+                mainPrice > 0 && price > 0
+                  ? ((mainPrice - price) / mainPrice) * 100
+                  : 0;
+
+              return (
+                <FormItem>
+                  <FormLabel>Selling Price (৳) *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={field.value || ""}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        field.onChange(isNaN(value) ? 0 : value);
+                      }}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {calculatedDiscount > 0 && (
+                      <span className="text-green-600 font-semibold">
+                        Discount: {calculatedDiscount.toFixed(1)}% off
+                      </span>
+                    )}
+                    {calculatedDiscount === 0 &&
+                      "The actual selling price (discounted)"}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
 
           {/* Category */}
@@ -405,36 +526,6 @@ export function ProductForm({
                     disabled={loading}
                   />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Discount */}
-          <FormField
-            control={form.control}
-            name="discount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Discount (%)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    step="1"
-                    min="0"
-                    max="100"
-                    placeholder="0"
-                    value={field.value || ""}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      field.onChange(isNaN(value) ? 0 : value);
-                    }}
-                    disabled={loading}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Enter discount percentage (0-100)
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -645,6 +736,60 @@ export function ProductForm({
           </div>
         )}
 
+        {/* Sizes Selection */}
+        <FormField
+          control={form.control}
+          name="sizes"
+          render={() => (
+            <FormItem>
+              <div className="mb-4">
+                <FormLabel>Available Sizes (Optional)</FormLabel>
+                <FormDescription>
+                  Select sizes available for this product. Leave empty if sizes don't apply.
+                </FormDescription>
+              </div>
+              <div className="grid grid-cols-4 md:grid-cols-7 gap-3">
+                {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'].map((size) => (
+                  <FormField
+                    key={size}
+                    control={form.control}
+                    name="sizes"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={size}
+                          className="flex flex-row items-center space-x-2 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(size)}
+                              onCheckedChange={(checked) => {
+                                const currentValue = field.value || [];
+                                return checked
+                                  ? field.onChange([...currentValue, size])
+                                  : field.onChange(
+                                      currentValue.filter(
+                                        (value) => value !== size
+                                      )
+                                    );
+                              }}
+                              disabled={loading}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal cursor-pointer">
+                            {size}
+                          </FormLabel>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Checkboxes */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Flash Sale */}
@@ -716,7 +861,8 @@ export function ProductForm({
             </Button>
           )}
         </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </>
   );
 }

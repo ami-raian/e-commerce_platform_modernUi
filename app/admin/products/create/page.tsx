@@ -11,18 +11,19 @@ export default function CreateProductPage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const authLoading = useAuthStore((state) => state.loading);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
   useEffect(() => {
-    // Wait for auth to finish loading before checking user
-    if (authLoading) return;
+    // Wait for zustand to rehydrate from storage AND auth loading to finish
+    if (!hasHydrated || authLoading) return;
 
     if (!user || user.role !== "admin") {
       router.push("/login");
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, hasHydrated, router]);
 
-  // Show loading spinner while checking authentication
-  if (authLoading) {
+  // Show loading spinner while checking authentication or waiting for rehydration
+  if (!hasHydrated || authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">

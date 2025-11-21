@@ -16,6 +16,7 @@ interface AuthStore {
   user: User | null;
   loading: boolean;
   error: string | null;
+  hasHydrated: boolean; // Track if zustand has rehydrated from storage
 
   // Auth operations
   login: (
@@ -34,6 +35,7 @@ interface AuthStore {
 
   // Update user data
   setUser: (user: User | null) => void;
+  setHasHydrated: (hydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -42,6 +44,7 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       loading: false,
       error: null,
+      hasHydrated: false,
 
       login: async (email, password) => {
         set({ loading: true, error: null });
@@ -89,24 +92,49 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       initializeAuth: async () => {
-        set({ loading: true });
-        try {
-          const user = await verifyToken();
-          set({ user, loading: false, error: null });
-        } catch (error) {
-          // Silently fail - user is not authenticated, which is fine for public pages
-          set({ user: null, loading: false, error: null });
+        // Don't overwrite user if already logged in from persisted state
+        const currentUser = get().user;
+
+        // If we have a persisted user, verify the token is still valid
+        if (currentUser) {
+          set({ loading: true });
+          try {
+            const user = await verifyToken();
+            // Token is valid, update with fresh user data
+            set({ user, loading: false, error: null });
+          } catch (error) {
+            // Token expired or invalid, clear user
+            set({ user: null, loading: false, error: null });
+          }
+        } else {
+          // No persisted user, just verify if there's a token in cookie
+          set({ loading: true });
+          try {
+            const user = await verifyToken();
+            set({ user, loading: false, error: null });
+          } catch (error) {
+            // Silently fail - user is not authenticated
+            set({ user: null, loading: false, error: null });
+          }
         }
       },
 
       setUser: (user) => {
         set({ user });
       },
+
+      setHasHydrated: (hydrated) => {
+        set({ hasHydrated: hydrated });
+      },
     }),
     {
       name: "auth-store",
       // Only persist user data, not loading/error states
       partialize: (state) => ({ user: state.user }),
+      // Track when rehydration is complete
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

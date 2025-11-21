@@ -7,6 +7,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useProductStore, type Product } from "@/lib/product-store";
 import Image from "next/image";
 import { getImageUrl } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function ProductPage({
   params,
@@ -35,6 +36,7 @@ export default function ProductPage({
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoMessage, setPromoMessage] = useState("");
+  const [selectedSize, setSelectedSize] = useState<string>("");
   const addItem = useCartStore((state) => state.addItem);
 
   const promoCodes: { [key: string]: number } = {
@@ -58,6 +60,7 @@ export default function ProductPage({
 
   const calculateFinalPrice = () => {
     if (!product) return 0;
+    // Apply promo code discount on top of the already discounted price
     if (discount > 0) {
       return product.price - (product.price * discount) / 100;
     }
@@ -100,6 +103,12 @@ export default function ProductPage({
   }
 
   const handleAddToCart = () => {
+    // Validate size selection if product has sizes
+    if (product.sizes.length > 0 && !selectedSize) {
+      toast.error("Please select a size before adding to cart");
+      return;
+    }
+
     addItem({
       productId: product._id,
       name: product.name,
@@ -107,7 +116,15 @@ export default function ProductPage({
       quantity,
       image:
         product.images?.[0] ?? (product as any).image ?? "/placeholder.svg",
+      size: selectedSize || undefined,
     });
+
+    const sizeInfo = selectedSize ? ` - Size: ${selectedSize}` : "";
+    toast.success(`${product.name} added to cart!`, {
+      description: `৳${product.price.toLocaleString("en-BD")} - Quantity: ${quantity}${sizeInfo}`,
+      duration: 2000,
+    });
+
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
@@ -216,28 +233,44 @@ export default function ProductPage({
 
           {/* Price */}
           <div className="space-y-2">
-            <p className="text-muted-foreground">Price</p>
-            {discount > 0 ? (
-              <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <p className="text-muted-foreground">Price</p>
+              {product.discountPercent > 0 && (
+                <span className="bg-red-500 text-white px-2 py-1 rounded-md text-sm font-bold">
+                  -{Math.round(product.discountPercent)}% OFF
+                </span>
+              )}
+            </div>
+            <div className="space-y-2">
+              {product.discountPercent > 0 && (
                 <p className="text-2xl text-muted-foreground line-through">
-                  ৳{product.price.toLocaleString("en-BD")}
+                  ৳{product.mainPrice.toLocaleString("en-BD")}
                 </p>
-                <p className="text-4xl font-bold text-primary">
-                  ৳{calculateFinalPrice().toLocaleString("en-BD")}
-                </p>
+              )}
+              <p className="text-4xl font-bold text-primary">
+                ৳
+                {(discount > 0
+                  ? calculateFinalPrice()
+                  : product.price
+                ).toLocaleString("en-BD")}
+              </p>
+              {product.discountPercent > 0 && discount === 0 && (
                 <p className="text-green-600 font-semibold">
                   You save: ৳
+                  {(product.mainPrice - product.price).toLocaleString("en-BD")}{" "}
+                  ({Math.round(product.discountPercent)}% off)
+                </p>
+              )}
+              {discount > 0 && (
+                <p className="text-green-600 font-semibold">
+                  Extra promo discount: ৳
                   {(product.price - calculateFinalPrice()).toLocaleString(
                     "en-BD"
                   )}{" "}
-                  ({discount}% off)
+                  ({discount}% off with code)
                 </p>
-              </div>
-            ) : (
-              <p className="text-4xl font-bold text-primary">
-                ৳{product.price.toLocaleString("en-BD")}
-              </p>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Promo Code Section */}
@@ -298,6 +331,35 @@ export default function ProductPage({
             </span>
           </div>
 
+          {/* Size Selection */}
+          {product.sizes.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium">Select Size</p>
+                {selectedSize && (
+                  <span className="text-xs text-primary font-semibold">
+                    Selected: {selectedSize}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-4 py-2 border rounded-lg font-medium transition-all ${
+                      selectedSize === size
+                        ? "border-primary bg-primary text-primary-foreground shadow-md"
+                        : "border-border hover:border-primary hover:bg-accent"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Quantity Selector */}
           <div className="space-y-2">
             <p className="text-sm font-medium">Quantity</p>
@@ -350,12 +412,20 @@ export default function ProductPage({
               </p>
               <p className="capitalize font-semibold">{product.category}</p>
             </div>
-            <div>
+            {product.sizes.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">
+                  Available Sizes
+                </p>
+                <p className="font-semibold">{product.sizes.join(", ")}</p>
+              </div>
+            )}
+            {/* <div>
               <p className="text-sm font-medium text-muted-foreground mb-2">
                 SKU
               </p>
               <p className="font-mono text-sm">{product._id}</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

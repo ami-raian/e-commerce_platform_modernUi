@@ -20,6 +20,7 @@ interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  size?: string;
 }
 
 interface OrderConfirmationEmailProps {
@@ -133,6 +134,9 @@ export const OrderConfirmationEmail = ({
               <Row key={index} style={itemRow}>
                 <Column style={itemColumn}>
                   <Text style={itemName}>{item.name}</Text>
+                  {item.size && (
+                    <Text style={itemDetails}>Size: {item.size}</Text>
+                  )}
                   <Text style={itemDetails}>
                     Quantity: {item.quantity} × ৳
                     {item.price.toLocaleString("en-BD")}

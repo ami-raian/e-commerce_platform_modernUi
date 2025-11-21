@@ -19,6 +19,7 @@ export default function UserDashboard() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const authLoading = useAuthStore((state) => state.loading);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const logout = useAuthStore((state) => state.logout);
   const cartItems = useCartStore((state) => state.items);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -50,21 +51,21 @@ export default function UserDashboard() {
   }, []);
 
   useEffect(() => {
-    // Wait for auth to finish loading before checking user
-    if (authLoading) return;
+    // Wait for zustand to rehydrate from storage AND auth loading to finish
+    if (!hasHydrated || authLoading) return;
 
     if (!user) {
       router.push("/login");
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, hasHydrated, router]);
 
   const handleLogout = () => {
     logout();
     router.push("/");
   };
 
-  // Show loading spinner while checking authentication
-  if (authLoading || !mounted) {
+  // Show loading spinner while checking authentication or waiting for rehydration
+  if (!hasHydrated || authLoading || !mounted) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">

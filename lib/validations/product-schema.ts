@@ -14,12 +14,19 @@ export const createProductSchema = z.object({
     .max(2000, 'Description cannot exceed 2000 characters')
     .trim(),
 
+  mainPrice: z
+    .number({
+      required_error: 'Original price is required',
+      invalid_type_error: 'Original price must be a number',
+    })
+    .min(0, 'Original price cannot be negative'),
+
   price: z
     .number({
-      required_error: 'Price is required',
-      invalid_type_error: 'Price must be a number',
+      required_error: 'Selling price is required',
+      invalid_type_error: 'Selling price must be a number',
     })
-    .min(0, 'Price cannot be negative'),
+    .min(0, 'Selling price cannot be negative'),
 
   category: z.enum(['electronics', 'fashion', 'beauty', 'accessories', 'home'], {
     required_error: 'Category is required',
@@ -50,15 +57,15 @@ export const createProductSchema = z.object({
 
   isFlashSale: z.boolean().default(false),
 
-  discount: z
-    .number({
-      invalid_type_error: 'Discount must be a number',
-    })
-    .min(0, 'Discount must be between 0 and 100')
-    .max(100, 'Discount must be between 0 and 100')
-    .default(0),
-
   isActive: z.boolean().default(true),
+
+  sizes: z
+    .array(
+      z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'], {
+        errorMap: () => ({ message: 'Invalid size. Must be one of: XS, S, M, L, XL, XXL, XXXL' }),
+      })
+    )
+    .default([]),
 })
 
 // Form data type (includes files for image upload)
