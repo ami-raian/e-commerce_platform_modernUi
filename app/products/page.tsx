@@ -1,11 +1,20 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { Filter, ChevronDown } from "lucide-react";
+import {
+  Filter,
+  X,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+} from "lucide-react";
 import { ProductCard } from "@/components/products/product-card";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useProductStore, type Product } from "@/lib/product-store";
 import { getImageUrl } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 function ProductsContent() {
   const router = useRouter();
@@ -21,7 +30,18 @@ function ProductsContent() {
   const [selectedSubCategory, setSelectedSubCategory] = useState(
     searchParams.get("subCategory") || "all"
   );
+  const [priceRange, setPriceRange] = useState({
+    min: 0,
+    max: 10000,
+  });
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    category: true,
+    subCategory: true,
+    price: true,
+    sort: true,
+  });
 
   // Update URL params
   const updateURLParams = (
@@ -67,6 +87,11 @@ function ProductsContent() {
       filtered = filtered.filter((p) => p.subCategory === selectedSubCategory);
     }
 
+    // Filter by price range
+    filtered = filtered.filter(
+      (p) => p.price >= priceRange.min && p.price <= priceRange.max
+    );
+
     // Sort
     if (sortBy === "price-asc") {
       filtered.sort((a, b) => a.price - b.price);
@@ -77,7 +102,7 @@ function ProductsContent() {
     }
 
     setFilteredProducts(filtered);
-  }, [sortBy, selectedCategory, selectedSubCategory, products]);
+  }, [sortBy, selectedCategory, selectedSubCategory, products, priceRange]);
 
   const handleCategoryChange = (cat: string) => {
     setSelectedCategory(cat);
@@ -102,125 +127,377 @@ function ProductsContent() {
     updateURLParams(selectedCategory, selectedSubCategory, sort);
   };
 
-  // const categories = ["all", "fashion", "electronics", "home", "beauty"];
-  const categories = ["all", "fashion"];
-  const fashionSubCategories = [
-    { value: "all", label: "All Fashion" },
-    { value: "gents", label: "Gents" },
-    { value: "ladies", label: "Ladies" },
+  const handleClearFilters = () => {
+    setSelectedCategory("all");
+    setSelectedSubCategory("all");
+    setSortBy("popularity");
+    setPriceRange({ min: 0, max: 10000 });
+    router.push("/products", { scroll: false });
+  };
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const categories = [
+    { value: "all", label: "All Products", count: products.length },
+    {
+      value: "fashion",
+      label: "Fashion",
+      count: products.filter((p) => p.category === "fashion").length,
+    },
   ];
+
+  const fashionSubCategories = [
+    {
+      value: "all",
+      label: "All Fashion",
+      count: products.filter((p) => p.category === "fashion").length,
+    },
+    {
+      value: "gents",
+      label: "Gents",
+      count: products.filter((p) => p.subCategory === "gents").length,
+    },
+    {
+      value: "ladies",
+      label: "Ladies",
+      count: products.filter((p) => p.subCategory === "ladies").length,
+    },
+  ];
+
   const sortOptions = [
     { value: "popularity", label: "Most Popular" },
     { value: "price-asc", label: "Price: Low to High" },
     { value: "price-desc", label: "Price: High to Low" },
-    { value: "newest", label: "Newest" },
+    { value: "newest", label: "Newest Arrivals" },
   ];
+
+  const priceRanges = [
+    { min: 0, max: 1000, label: "Under ৳1,000" },
+    { min: 1000, max: 3000, label: "৳1,000 - ৳3,000" },
+    { min: 3000, max: 5000, label: "৳3,000 - ৳5,000" },
+    { min: 5000, max: 10000, label: "Above ৳5,000" },
+  ];
+
+  const activeFiltersCount =
+    (selectedCategory !== "all" ? 1 : 0) +
+    (selectedSubCategory !== "all" ? 1 : 0) +
+    (sortBy !== "popularity" ? 1 : 0) +
+    (priceRange.min !== 0 || priceRange.max !== 10000 ? 1 : 0);
+
+  // Filter sidebar component
+  const FilterSidebar = () => (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal size={20} className="text-primary" />
+          <h2 className="text-lg font-semibold">Filters</h2>
+          {activeFiltersCount > 0 && (
+            <Badge variant="default" className="ml-2">
+              {activeFiltersCount}
+            </Badge>
+          )}
+        </div>
+        {activeFiltersCount > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClearFilters}
+            className="text-xs"
+          >
+            Clear All
+          </Button>
+        )}
+      </div>
+
+      {/* Category Filter */}
+      <Card>
+        <CardHeader className="py-4">
+          <button
+            onClick={() => toggleSection("category")}
+            className="flex items-center justify-between w-full"
+          >
+            <CardTitle className="text-base">Category</CardTitle>
+            {expandedSections.category ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+        </CardHeader>
+        {expandedSections.category && (
+          <CardContent className="space-y-2 pb-4">
+            {categories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => handleCategoryChange(cat.value)}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-all flex items-center justify-between group ${
+                  selectedCategory === cat.value
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-accent"
+                }`}
+              >
+                <span className="capitalize font-medium">{cat.label}</span>
+                <span
+                  className={`text-xs ${
+                    selectedCategory === cat.value
+                      ? "text-primary-foreground/80"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {cat.count}
+                </span>
+              </button>
+            ))}
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Subcategory Filter (Fashion only) */}
+      {selectedCategory === "fashion" && (
+        <Card>
+          <CardHeader className="py-4">
+            <button
+              onClick={() => toggleSection("subCategory")}
+              className="flex items-center justify-between w-full"
+            >
+              <CardTitle className="text-base">Type</CardTitle>
+              {expandedSections.subCategory ? (
+                <ChevronUp size={16} />
+              ) : (
+                <ChevronDown size={16} />
+              )}
+            </button>
+          </CardHeader>
+          {expandedSections.subCategory && (
+            <CardContent className="space-y-2 pb-4">
+              {fashionSubCategories.map((subCat) => (
+                <button
+                  key={subCat.value}
+                  onClick={() => handleSubCategoryChange(subCat.value)}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-all flex items-center justify-between ${
+                    selectedSubCategory === subCat.value
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-accent"
+                  }`}
+                >
+                  <span className="font-medium">{subCat.label}</span>
+                  <span
+                    className={`text-xs ${
+                      selectedSubCategory === subCat.value
+                        ? "text-primary-foreground/80"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {subCat.count}
+                  </span>
+                </button>
+              ))}
+            </CardContent>
+          )}
+        </Card>
+      )}
+
+      {/* Price Range Filter */}
+      <Card>
+        <CardHeader className="py-4">
+          <button
+            onClick={() => toggleSection("price")}
+            className="flex items-center justify-between w-full"
+          >
+            <CardTitle className="text-base">Price Range</CardTitle>
+            {expandedSections.price ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+        </CardHeader>
+        {expandedSections.price && (
+          <CardContent className="space-y-2 pb-4">
+            {priceRanges.map((range) => (
+              <button
+                key={`${range.min}-${range.max}`}
+                onClick={() =>
+                  setPriceRange({ min: range.min, max: range.max })
+                }
+                className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+                  priceRange.min === range.min && priceRange.max === range.max
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-accent"
+                }`}
+              >
+                <span className="font-medium">{range.label}</span>
+              </button>
+            ))}
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Sort Options */}
+      <Card>
+        <CardHeader className="py-4">
+          <button
+            onClick={() => toggleSection("sort")}
+            className="flex items-center justify-between w-full"
+          >
+            <CardTitle className="text-base">Sort By</CardTitle>
+            {expandedSections.sort ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+        </CardHeader>
+        {expandedSections.sort && (
+          <CardContent className="space-y-2 pb-4">
+            {sortOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleSortChange(option.value)}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+                  sortBy === option.value
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-accent"
+                }`}
+              >
+                <span className="font-medium">{option.label}</span>
+              </button>
+            ))}
+          </CardContent>
+        )}
+      </Card>
+    </div>
+  );
 
   return (
     <div className="container-xl py-8">
-      <div className="flex flex-col gap-8">
-        {/* <div>
-          <h1 className="section-title mb-2">All Products</h1>
-          <p className="">
-            Explore our complete collection of premium products
-          </p>
-        </div> */}
+      {/* Page Header */}
+      {/* <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">All Products</h1>
+        <p className="text-muted-foreground">
+          Explore our complete collection of premium products
+        </p>
+      </div> */}
 
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-          <div className="flex flex-col gap-3 w-full md:w-auto">
-            {/* Main Category Filter */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Filter size={20} />
-              <div className="flex gap-2 flex-wrap">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => handleCategoryChange(cat)}
-                    className={`px-4 py-2 rounded-full capitalize transition-colors ${
-                      selectedCategory === cat
-                        ? "bg-primary text-white"
-                        : "border border-border hover:border-primary"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+      {/* Mobile Filter Button */}
+      <div className="lg:hidden mb-6">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+        >
+          <Filter size={18} />
+          Filters
+          {activeFiltersCount > 0 && (
+            <Badge variant="default" className="ml-2">
+              {activeFiltersCount}
+            </Badge>
+          )}
+        </Button>
+      </div>
+
+      {/* Mobile Filters Overlay */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            onClick={() => setShowMobileFilters(false)}
+          />
+          <div className="absolute inset-y-0 left-0 w-full max-w-sm bg-background shadow-lg overflow-y-auto">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold">Filters</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowMobileFilters(false)}
+                >
+                  <X size={20} />
+                </Button>
+              </div>
+              <FilterSidebar />
+              <div className="mt-6 sticky bottom-0 bg-background pt-4 border-t">
+                <Button
+                  className="w-full"
+                  onClick={() => setShowMobileFilters(false)}
+                >
+                  View {filteredProducts.length} Products
+                </Button>
               </div>
             </div>
-
-            {/* Fashion Subcategory Filter */}
-            {selectedCategory === "fashion" && (
-              <div className="flex items-center gap-2 flex-wrap ml-7">
-                <span className="text-sm text-muted-foreground">Type:</span>
-                <div className="flex gap-2 flex-wrap">
-                  {fashionSubCategories.map((subCat) => (
-                    <button
-                      key={subCat.value}
-                      onClick={() => handleSubCategoryChange(subCat.value)}
-                      className={`px-3 py-1.5 text-sm rounded-full capitalize transition-colors ${
-                        selectedSubCategory === subCat.value
-                          ? "bg-primary text-white"
-                          : "border border-border hover:border-primary"
-                      }`}
-                    >
-                      {subCat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="relative w-full md:w-auto">
-            <select
-              value={sortBy}
-              onChange={(e) => handleSortChange(e.target.value)}
-              className="appearance-none bg-background border border-border px-4 py-2 rounded-lg pr-10 cursor-pointer w-full md:w-auto"
-            >
-              {sortOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-              size={16}
-            />
           </div>
         </div>
+      )}
 
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading products...</p>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Desktop Filters Sidebar */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <FilterSidebar />
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  id={product._id}
-                  name={product.name}
-                  mainPrice={product.mainPrice}
-                  price={product.price}
-                  discountPercent={product.discountPercent}
-                  image={getImageUrl(product.images[0])}
-                  category={product.category}
-                  rating={product.rating}
-                />
-              ))}
-            </div>
+        </aside>
 
-            {filteredProducts.length === 0 && !loading && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">
-                  No products found matching your filters.
-                </p>
+        {/* Products Grid */}
+        <div className="lg:col-span-3">
+          {/* Results Header */}
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+            <p className="text-muted-foreground">
+              Showing{" "}
+              <span className="font-semibold text-foreground">
+                {filteredProducts.length}
+              </span>{" "}
+              {filteredProducts.length === 1 ? "product" : "products"}
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Loading products...</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    id={product._id}
+                    name={product.name}
+                    mainPrice={product.mainPrice}
+                    price={product.price}
+                    discountPercent={product.discountPercent}
+                    image={getImageUrl(product.images[0])}
+                    category={product.category}
+                    rating={product.rating}
+                  />
+                ))}
               </div>
-            )}
-          </>
-        )}
+
+              {filteredProducts.length === 0 && !loading && (
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                    <Filter size={32} className="text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    No products found
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Try adjusting your filters to find what you're looking for
+                  </p>
+                  <Button variant="outline" onClick={handleClearFilters}>
+                    Clear All Filters
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
