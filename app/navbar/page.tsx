@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react"
-import { useTheme } from "@/components/providers/theme-provider"
-import { useCartStore } from "@/lib/cart-store"
+import { useState } from "react";
+import Link from "next/link";
+import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react";
+import { useTheme } from "@/components/providers/theme-provider";
+import { useCartStore } from "@/lib/cart-store";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { theme, toggleTheme } = useTheme()
-  const itemCount = useCartStore((state) => state.getItemCount())
+  const [isOpen, setIsOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const itemCount = useCartStore((state) => state.getItemCount());
 
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-50">
@@ -20,16 +20,28 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/products" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Products
           </Link>
-          <Link href="/products?category=electronics" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products?category=electronics"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Electronics
           </Link>
-          <Link href="/products?category=fashion" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products?category=fashion"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Fashion
           </Link>
-          <Link href="/products?category=home" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products?category=home"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Home
           </Link>
         </div>
@@ -39,10 +51,16 @@ export default function Navbar() {
           <button className="p-2 hover:bg-accent rounded-lg transition-colors">
             <Search size={20} />
           </button>
-          <button onClick={toggleTheme} className="p-2 hover:bg-accent rounded-lg transition-colors">
+          <button
+            onClick={toggleTheme}
+            className="p-2 hover:bg-accent rounded-lg transition-colors"
+          >
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          <Link href="/cart" className="p-2 hover:bg-accent rounded-lg transition-colors relative">
+          <Link
+            href="/cart"
+            className="p-2 hover:bg-accent rounded-lg transition-colors relative"
+          >
             <ShoppingCart size={20} />
             {itemCount > 0 && (
               <span className="absolute top-0 right-0 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
@@ -64,20 +82,32 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden border-t border-border p-4 flex flex-col gap-4">
-          <Link href="/products" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Products
           </Link>
-          <Link href="/products?category=electronics" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products?category=electronics"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Electronics
           </Link>
-          <Link href="/products?category=fashion" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products?category=fashion"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Fashion
           </Link>
-          <Link href="/products?category=home" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/products?category=home"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Home
           </Link>
         </div>
       )}
     </nav>
-  )
+  );
 }

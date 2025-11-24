@@ -122,15 +122,19 @@ export function Navbar() {
           {/* Search */}
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className="p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
+            className={`p-2 rounded-lg transition-colors ${
+              showSearch
+                ? "bg-primary/10 text-primary"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
             aria-label="Search"
           >
-            <Search size={20} />
+            <Search size={20} className={showSearch ? "stroke-[2.5]" : ""} />
           </button>
 
           <button
             onClick={toggleTheme}
-            className="p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
+            className="p-2 rounded-lg transition-colors text-foreground hover:bg-primary/10 hover:text-primary"
             aria-label="Toggle theme"
           >
             {mounted ? (
@@ -148,11 +152,14 @@ export function Navbar() {
             href="/cart"
             className={`p-2 rounded-lg transition-colors relative ${
               isActive("/cart")
-                ? "bg-accent text-primary"
-                : "text-foreground hover:bg-accent"
+                ? "bg-primary/10 text-primary"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
             }`}
           >
-            <ShoppingCart size={20} />
+            <ShoppingCart
+              size={20}
+              className={isActive("/cart") ? "stroke-[2.5]" : ""}
+            />
             {mounted && cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                 {cartCount}
@@ -188,10 +195,18 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
+            className={`md:hidden p-2 rounded-lg transition-colors ${
+              isOpen
+                ? "bg-primary/10 text-primary"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
+            {isOpen ? (
+              <X size={20} className="stroke-[2.5]" />
+            ) : (
+              <Menu size={20} />
+            )}
           </button>
         </div>
       </div>
