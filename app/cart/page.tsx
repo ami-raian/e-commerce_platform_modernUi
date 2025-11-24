@@ -26,9 +26,8 @@ export default function CartPage() {
 
   const subtotal = getTotal();
   const promoDiscount = calculateDiscount(subtotal);
-  const tax = (subtotal - promoDiscount) * 0.1;
   const shipping = subtotal > 100 ? 0 : 10;
-  const total = subtotal - promoDiscount + tax + shipping;
+  const total = subtotal - promoDiscount + shipping;
 
   return (
     <div className="container-xl py-8">
@@ -92,13 +91,6 @@ export default function CartPage() {
                     </span>
                   </div>
                 )}
-
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span className="font-medium">
-                    ৳{tax.toLocaleString("en-BD")}
-                  </span>
-                </div>
 
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
