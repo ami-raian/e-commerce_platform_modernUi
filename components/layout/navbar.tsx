@@ -148,11 +148,14 @@ export function Navbar() {
             href="/cart"
             className={`p-2 rounded-lg transition-colors relative ${
               isActive("/cart")
-                ? "bg-accent text-primary"
+                ? "bg-primary/10 text-primary"
                 : "text-foreground hover:bg-accent"
             }`}
           >
-            <ShoppingCart size={20} />
+            <ShoppingCart
+              size={20}
+              className={isActive("/cart") ? "stroke-[2.5]" : ""}
+            />
             {mounted && cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                 {cartCount}
