@@ -19,13 +19,10 @@ interface OrderEmailData {
   phone: string;
   address: string;
   city: string;
-  state: string;
-  zipCode: string;
   cartItems: CartItem[];
   subtotal: number;
   promoDiscount: number;
   appliedPromoCode?: string;
-  tax: number;
   shipping: number;
   total: number;
   paymentMethod: string;

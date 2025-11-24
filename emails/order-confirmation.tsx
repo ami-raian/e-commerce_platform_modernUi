@@ -29,13 +29,10 @@ interface OrderConfirmationEmailProps {
   phone: string;
   address: string;
   city: string;
-  state: string;
-  zipCode: string;
   cartItems: CartItem[];
   subtotal: number;
   promoDiscount: number;
   appliedPromoCode?: string;
-  tax: number;
   shipping: number;
   total: number;
   paymentMethod: string;
@@ -49,13 +46,10 @@ export const OrderConfirmationEmail = ({
   phone,
   address,
   city,
-  state,
-  zipCode,
   cartItems,
   subtotal,
   promoDiscount,
   appliedPromoCode,
-  tax,
   shipping,
   total,
   paymentMethod,
@@ -114,12 +108,6 @@ export const OrderConfirmationEmail = ({
             </Text>
             <Text style={infoText}>
               <strong>City:</strong> {city}
-            </Text>
-            <Text style={infoText}>
-              <strong>State:</strong> {state}
-            </Text>
-            <Text style={infoText}>
-              <strong>Zip Code:</strong> {zipCode}
             </Text>
           </Section>
 
@@ -183,15 +171,6 @@ export const OrderConfirmationEmail = ({
                 </Column>
               </Row>
             )}
-
-            <Row style={summaryRow}>
-              <Column>
-                <Text style={summaryLabel}>Tax:</Text>
-              </Column>
-              <Column align="right">
-                <Text style={summaryValue}>৳{tax.toLocaleString("en-BD")}</Text>
-              </Column>
-            </Row>
 
             <Row style={summaryRow}>
               <Column>
