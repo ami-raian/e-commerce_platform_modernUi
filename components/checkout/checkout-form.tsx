@@ -15,7 +15,6 @@ interface CheckoutFormProps {
   subtotal: number;
   promoDiscount: number;
   appliedPromoCode?: string;
-  tax: number;
   shipping: number;
 }
 
@@ -25,7 +24,6 @@ export function CheckoutForm({
   subtotal,
   promoDiscount,
   appliedPromoCode,
-  tax,
   shipping,
 }: CheckoutFormProps) {
   const router = useRouter();
@@ -37,8 +35,6 @@ export function CheckoutForm({
     phone: "",
     address: "",
     city: "",
-    state: "",
-    zipCode: "",
   });
   const [selectedPayment, setSelectedPayment] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
@@ -56,9 +52,7 @@ export function CheckoutForm({
       newFormData.email.trim() &&
       newFormData.phone.trim() &&
       newFormData.address.trim() &&
-      newFormData.city.trim() &&
-      newFormData.state.trim() &&
-      newFormData.zipCode.trim();
+      newFormData.city.trim();
 
     setIsFormValid(!!isValid);
   };
@@ -103,13 +97,10 @@ export function CheckoutForm({
           phone: formData.phone,
           address: formData.address,
           city: formData.city,
-          state: formData.state,
-          zipCode: formData.zipCode,
           cartItems: cartItems,
           subtotal: subtotal,
           promoDiscount: promoDiscount,
           appliedPromoCode: appliedPromoCode,
-          tax: tax,
           shipping: shipping,
           total: total,
           paymentMethod: paymentMethod.name,
@@ -217,36 +208,12 @@ export function CheckoutForm({
             />
           </div>
 
-          <div>
+          <div className="col-span-2">
             <Label htmlFor="city">City</Label>
             <Input
               id="city"
               name="city"
               value={formData.city}
-              onChange={handleChange}
-              required
-              className="mt-2"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="state">State</Label>
-            <Input
-              id="state"
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-              required
-              className="mt-2"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <Label htmlFor="zipCode">Zip Code</Label>
-            <Input
-              id="zipCode"
-              name="zipCode"
-              value={formData.zipCode}
               onChange={handleChange}
               required
               className="mt-2"
