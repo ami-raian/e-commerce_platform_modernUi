@@ -119,12 +119,12 @@ function ProductsContent() {
   return (
     <div className="container-xl py-8">
       <div className="flex flex-col gap-8">
-        <div>
+        {/* <div>
           <h1 className="section-title mb-2">All Products</h1>
           <p className="">
             Explore our complete collection of premium products
           </p>
-        </div>
+        </div> */}
 
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
           <div className="flex flex-col gap-3 w-full md:w-auto">
