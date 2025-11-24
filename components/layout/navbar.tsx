@@ -122,15 +122,19 @@ export function Navbar() {
           {/* Search */}
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className="p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
+            className={`p-2 rounded-lg transition-colors ${
+              showSearch
+                ? "bg-primary/10 text-primary"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
             aria-label="Search"
           >
-            <Search size={20} />
+            <Search size={20} className={showSearch ? "stroke-[2.5]" : ""} />
           </button>
 
           <button
             onClick={toggleTheme}
-            className="p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
+            className="p-2 rounded-lg transition-colors text-foreground hover:bg-primary/10 hover:text-primary"
             aria-label="Toggle theme"
           >
             {mounted ? (
@@ -149,7 +153,7 @@ export function Navbar() {
             className={`p-2 rounded-lg transition-colors relative ${
               isActive("/cart")
                 ? "bg-primary/10 text-primary"
-                : "text-foreground hover:bg-accent"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
             }`}
           >
             <ShoppingCart
@@ -191,10 +195,18 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 hover:bg-accent rounded-lg transition-colors text-foreground"
+            className={`md:hidden p-2 rounded-lg transition-colors ${
+              isOpen
+                ? "bg-primary/10 text-primary"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
+            {isOpen ? (
+              <X size={20} className="stroke-[2.5]" />
+            ) : (
+              <Menu size={20} />
+            )}
           </button>
         </div>
       </div>
