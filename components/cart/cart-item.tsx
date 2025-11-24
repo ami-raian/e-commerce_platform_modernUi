@@ -22,10 +22,7 @@ export function CartItemComponent({
     <div className="flex gap-4 p-4 bg-card rounded-lg border border-border">
       <div className="w-24 h-24 rounded-lg overflow-hidden bg-accent shrink-0">
         <img
-          src={
-            `${process.env.NEXT_PUBLIC_IMG_URL}${item.image}` ||
-            "/placeholder.svg"
-          }
+          src={`${item.image}` || "/placeholder.svg"}
           alt={item.name}
           className="w-full h-full object-cover"
         />
