@@ -59,7 +59,9 @@ export function ProductCard({
         </div>
 
         <div className="flex-1 flex flex-col">
-          <h3 className="font-semibold text-lg mb-2">{name}</h3>
+          <h3 className="font-semibold text-lg mb-2 line-clamp-1" title={name}>
+            {name}
+          </h3>
 
           <div className="flex items-center gap-1 mb-4">
             <div className="flex">

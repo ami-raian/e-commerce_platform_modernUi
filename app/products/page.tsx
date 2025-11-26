@@ -11,6 +11,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { ProductCard } from "@/components/products/product-card";
+import { ProductCardSkeleton } from "@/components/products/product-card-skeleton";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useProductStore } from "@/lib/product-store";
 import { getImageUrl } from "@/lib/api";
@@ -455,8 +456,10 @@ function ProductsContent() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Loading products...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <ProductCardSkeleton key={index} />
+              ))}
             </div>
           ) : (
             <>
@@ -567,9 +570,34 @@ function ProductsContent() {
   );
 }
 
+function ProductsPageSkeleton() {
+  return (
+    <div className="container-xl py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar Skeleton */}
+        <aside className="hidden lg:block space-y-4">
+          <div className="h-10 bg-muted rounded animate-pulse" />
+          <div className="h-64 bg-muted rounded animate-pulse" />
+          <div className="h-48 bg-muted rounded animate-pulse" />
+        </aside>
+
+        {/* Products Grid Skeleton */}
+        <div className="lg:col-span-3">
+          <div className="h-10 bg-muted rounded mb-6 animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="container-xl py-8">Loading...</div>}>
+    <Suspense fallback={<ProductsPageSkeleton />}>
       <ProductsContent />
     </Suspense>
   );
