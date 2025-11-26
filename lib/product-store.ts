@@ -62,7 +62,7 @@ interface ProductStore {
 export const useProductStore = create<ProductStore>()((set, get) => ({
   products: [],
   pagination: null,
-  loading: false,
+  loading: true,
   error: null,
 
   // Fetch all products with filters
