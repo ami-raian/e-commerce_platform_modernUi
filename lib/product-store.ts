@@ -16,8 +16,16 @@ import {
   type UpdateProductData,
 } from "./api";
 
+interface PaginationData {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+}
+
 interface ProductStore {
   products: Product[];
+  pagination: PaginationData | null;
   loading: boolean;
   error: string | null;
 
@@ -53,6 +61,7 @@ interface ProductStore {
 
 export const useProductStore = create<ProductStore>()((set, get) => ({
   products: [],
+  pagination: null,
   loading: false,
   error: null,
 
@@ -61,7 +70,11 @@ export const useProductStore = create<ProductStore>()((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await getProductsAxios(filters);
-      set({ products: data.products, loading: false });
+      set({
+        products: data.products,
+        pagination: data.pagination,
+        loading: false
+      });
     } catch (error: any) {
       set({
         error: error.message || "Failed to fetch products",
