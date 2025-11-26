@@ -7,10 +7,12 @@ import {
   ChevronDown,
   ChevronUp,
   SlidersHorizontal,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { ProductCard } from "@/components/products/product-card";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useProductStore, type Product } from "@/lib/product-store";
+import { useProductStore } from "@/lib/product-store";
 import { getImageUrl } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +21,8 @@ import { Badge } from "@/components/ui/badge";
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { products, loading, fetchProducts } = useProductStore();
+  const { products, pagination, loading, fetchProducts } = useProductStore();
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [sortBy, setSortBy] = useState(
     searchParams.get("sort") || "popularity"
@@ -34,7 +37,6 @@ function ProductsContent() {
     min: 0,
     max: 10000,
   });
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     category: true,
@@ -47,7 +49,8 @@ function ProductsContent() {
   const updateURLParams = (
     category: string,
     subCategory: string,
-    sort: string
+    sort: string,
+    page?: number
   ) => {
     const params = new URLSearchParams();
 
@@ -63,46 +66,49 @@ function ProductsContent() {
       params.set("sort", sort);
     }
 
+    if (page && page > 1) {
+      params.set("page", page.toString());
+    }
+
     const queryString = params.toString();
     router.push(queryString ? `?${queryString}` : "/products", {
       scroll: false,
     });
   };
 
-  // Fetch products on mount
+  // Fetch products on mount and when filters or page change
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    const pageFromUrl = parseInt(searchParams.get("page") || "1");
+    setCurrentPage(pageFromUrl);
 
-  useEffect(() => {
-    let filtered = [...products];
+    const filters = {
+      page: pageFromUrl,
+      limit: 12,
+      category: selectedCategory !== "all" ? selectedCategory : undefined,
+      subCategory:
+        selectedSubCategory !== "all"
+          ? (selectedSubCategory as "gents" | "ladies")
+          : undefined,
+      sort: sortBy !== "popularity"
+        ? (sortBy as "price-asc" | "price-desc" | "newest" | "rating" | "popularity")
+        : undefined,
+    };
 
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
-    }
+    fetchProducts(filters);
+  }, [
+    fetchProducts,
+    searchParams,
+    selectedCategory,
+    selectedSubCategory,
+    sortBy,
+  ]);
 
-    // Filter by subcategory for fashion
-    if (selectedCategory === "fashion" && selectedSubCategory !== "all") {
-      filtered = filtered.filter((p) => p.subCategory === selectedSubCategory);
-    }
-
-    // Filter by price range
-    filtered = filtered.filter(
-      (p) => p.price >= priceRange.min && p.price <= priceRange.max
-    );
-
-    // Sort
-    if (sortBy === "price-asc") {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (sortBy === "price-desc") {
-      filtered.sort((a, b) => b.price - a.price);
-    } else if (sortBy === "newest") {
-      filtered.reverse();
-    }
-
-    setFilteredProducts(filtered);
-  }, [sortBy, selectedCategory, selectedSubCategory, products, priceRange]);
+  // Page change handler
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    updateURLParams(selectedCategory, selectedSubCategory, sortBy, page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleCategoryChange = (cat: string) => {
     setSelectedCategory(cat);
@@ -110,21 +116,25 @@ function ProductsContent() {
     if (cat !== "fashion") {
       setSelectedSubCategory("all");
     }
+    setCurrentPage(1);
     updateURLParams(
       cat,
       cat === "fashion" ? selectedSubCategory : "all",
-      sortBy
+      sortBy,
+      1
     );
   };
 
   const handleSubCategoryChange = (subCat: string) => {
     setSelectedSubCategory(subCat);
-    updateURLParams(selectedCategory, subCat, sortBy);
+    setCurrentPage(1);
+    updateURLParams(selectedCategory, subCat, sortBy, 1);
   };
 
   const handleSortChange = (sort: string) => {
     setSortBy(sort);
-    updateURLParams(selectedCategory, selectedSubCategory, sort);
+    setCurrentPage(1);
+    updateURLParams(selectedCategory, selectedSubCategory, sort, 1);
   };
 
   const handleClearFilters = () => {
@@ -132,6 +142,7 @@ function ProductsContent() {
     setSelectedSubCategory("all");
     setSortBy("popularity");
     setPriceRange({ min: 0, max: 10000 });
+    setCurrentPage(1);
     router.push("/products", { scroll: false });
   };
 
@@ -143,30 +154,14 @@ function ProductsContent() {
   };
 
   const categories = [
-    { value: "all", label: "All Products", count: products.length },
-    {
-      value: "fashion",
-      label: "Fashion",
-      count: products.filter((p) => p.category === "fashion").length,
-    },
+    { value: "all", label: "All Products" },
+    { value: "fashion", label: "Fashion" },
   ];
 
   const fashionSubCategories = [
-    {
-      value: "all",
-      label: "All Fashion",
-      count: products.filter((p) => p.category === "fashion").length,
-    },
-    {
-      value: "gents",
-      label: "Gents",
-      count: products.filter((p) => p.subCategory === "gents").length,
-    },
-    {
-      value: "ladies",
-      label: "Ladies",
-      count: products.filter((p) => p.subCategory === "ladies").length,
-    },
+    { value: "all", label: "All Fashion" },
+    { value: "gents", label: "Gents" },
+    { value: "ladies", label: "Ladies" },
   ];
 
   const sortOptions = [
@@ -236,22 +231,13 @@ function ProductsContent() {
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`w-full text-left px-3 py-2 rounded-lg transition-all flex items-center justify-between group ${
+                className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
                   selectedCategory === cat.value
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-accent"
                 }`}
               >
                 <span className="capitalize font-medium">{cat.label}</span>
-                <span
-                  className={`text-xs ${
-                    selectedCategory === cat.value
-                      ? "text-primary-foreground/80"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {cat.count}
-                </span>
               </button>
             ))}
           </CardContent>
@@ -280,22 +266,13 @@ function ProductsContent() {
                 <button
                   key={subCat.value}
                   onClick={() => handleSubCategoryChange(subCat.value)}
-                  className={`w-full text-left px-3 py-2 rounded-lg transition-all flex items-center justify-between ${
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
                     selectedSubCategory === subCat.value
                       ? "bg-primary text-primary-foreground"
                       : "hover:bg-accent"
                   }`}
                 >
                   <span className="font-medium">{subCat.label}</span>
-                  <span
-                    className={`text-xs ${
-                      selectedSubCategory === subCat.value
-                        ? "text-primary-foreground/80"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {subCat.count}
-                  </span>
                 </button>
               ))}
             </CardContent>
@@ -427,7 +404,7 @@ function ProductsContent() {
                   className="w-full"
                   onClick={() => setShowMobileFilters(false)}
                 >
-                  View {filteredProducts.length} Products
+                  View {pagination?.total || products.length} Products
                 </Button>
               </div>
             </div>
@@ -449,11 +426,31 @@ function ProductsContent() {
           {/* Results Header */}
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
             <p className="text-muted-foreground">
-              Showing{" "}
-              <span className="font-semibold text-foreground">
-                {filteredProducts.length}
-              </span>{" "}
-              {filteredProducts.length === 1 ? "product" : "products"}
+              {pagination ? (
+                <>
+                  Showing{" "}
+                  <span className="font-semibold text-foreground">
+                    {(pagination.page - 1) * pagination.limit + 1}
+                  </span>{" "}
+                  -{" "}
+                  <span className="font-semibold text-foreground">
+                    {Math.min(pagination.page * pagination.limit, pagination.total)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-foreground">
+                    {pagination.total}
+                  </span>{" "}
+                  products
+                </>
+              ) : (
+                <>
+                  Showing{" "}
+                  <span className="font-semibold text-foreground">
+                    {products.length}
+                  </span>{" "}
+                  {products.length === 1 ? "product" : "products"}
+                </>
+              )}
             </p>
           </div>
 
@@ -464,7 +461,7 @@ function ProductsContent() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
+                {products.map((product) => (
                   <ProductCard
                     key={product._id}
                     id={product._id}
@@ -479,7 +476,7 @@ function ProductsContent() {
                 ))}
               </div>
 
-              {filteredProducts.length === 0 && !loading && (
+              {products.length === 0 && !loading && (
                 <div className="text-center py-12">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
                     <Filter size={32} className="text-muted-foreground" />
@@ -493,6 +490,73 @@ function ProductsContent() {
                   <Button variant="outline" onClick={handleClearFilters}>
                     Clear All Filters
                   </Button>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {pagination && pagination.pages > 1 && (
+                <div className="mt-12 flex justify-center">
+                  <div className="flex items-center gap-2">
+                    {/* Previous Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="gap-1"
+                    >
+                      <ChevronLeft size={16} />
+                      Previous
+                    </Button>
+
+                    {/* Page Numbers */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: pagination.pages }, (_, i) => i + 1)
+                        .filter((page) => {
+                          // Show first page, last page, current page, and pages around current
+                          if (page === 1 || page === pagination.pages) return true;
+                          if (Math.abs(page - currentPage) <= 1) return true;
+                          return false;
+                        })
+                        .map((page, index, array) => {
+                          // Add ellipsis
+                          const prevPage = array[index - 1];
+                          const showEllipsis = prevPage && page - prevPage > 1;
+
+                          return (
+                            <div key={page} className="flex items-center gap-1">
+                              {showEllipsis && (
+                                <span className="px-2 text-muted-foreground">
+                                  ...
+                                </span>
+                              )}
+                              <Button
+                                variant={
+                                  currentPage === page ? "default" : "outline"
+                                }
+                                size="sm"
+                                onClick={() => handlePageChange(page)}
+                                className="min-w-[40px]"
+                              >
+                                {page}
+                              </Button>
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    {/* Next Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === pagination.pages}
+                      className="gap-1"
+                    >
+                      Next
+                      <ChevronRight size={16} />
+                    </Button>
+                  </div>
                 </div>
               )}
             </>
