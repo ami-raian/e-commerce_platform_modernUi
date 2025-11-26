@@ -27,19 +27,19 @@ export default function HomePage() {
     {
       title: "FASHION STYLE",
       subtitle: "Discover Your Perfect Look",
-      image: "/hero-bg-1.jpg",
+      image: "/hero-image1.png",
       gradient: "from-purple-600/80 via-primary/70 to-orange-600/80",
     },
     {
       title: "NEW COLLECTION",
       subtitle: "Trending This Season",
-      image: "/hero-bg-2.jpg",
+      image: "/hero-image2.jpg",
       gradient: "from-blue-600/80 via-primary/70 to-purple-600/80",
     },
     {
       title: "PREMIUM QUALITY",
       subtitle: "Curated With Excellence",
-      image: "/hero-bg-3.jpg",
+      image: "/hero-image3.jpg",
       gradient: "from-orange-600/80 via-primary/70 to-pink-600/80",
     },
   ];
@@ -80,16 +80,26 @@ export default function HomePage() {
   return (
     <div className="overflow-hidden">
       {/* Hero Section - Full Width with Image Background */}
-      <section className="relative h-[500px] md:h-[600px] lg:h-[700px] w-full">
+      <section className="relative h-[500px] md:h-[600px] lg:h-[700px] w-full overflow-hidden">
         {/* Hero Slide */}
         <div className="absolute inset-0">
-          {/* Background with gradient overlay */}
+          {/* Background Image */}
+          <Image
+            src={heroSlides[currentSlide].image}
+            alt={heroSlides[currentSlide].title}
+            fill
+            priority
+            className="object-cover"
+            quality={90}
+          />
+
+          {/* Gradient Overlay */}
           <div
             className={`absolute inset-0 bg-linear-to-br ${heroSlides[currentSlide].gradient}`}
-          >
-            {/* Optional: Add pattern overlay */}
-            <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-          </div>
+          />
+
+          {/* Optional: Add pattern overlay */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
 
           {/* Content */}
           <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
