@@ -10,11 +10,16 @@ export interface CartItem {
   size?: string
 }
 
+export type ShippingLocation = "inside-dhaka" | "outside-dhaka"
+
 interface CartStore {
   items: CartItem[]
+  shippingLocation: ShippingLocation
   addItem: (item: CartItem) => void
   removeItem: (productId: string, size?: string) => void
   updateQuantity: (productId: string, size: string | undefined, quantity: number) => void
+  setShippingLocation: (location: ShippingLocation) => void
+  getShippingCost: () => number
   clearCart: () => void
   getTotal: () => number
   getItemCount: () => number
@@ -24,6 +29,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      shippingLocation: "inside-dhaka",
       addItem: (item) =>
         set((state) => {
           const existingItem = state.items.find(
@@ -50,6 +56,11 @@ export const useCartStore = create<CartStore>()(
             i.productId === productId && i.size === size ? { ...i, quantity } : i
           ),
         })),
+      setShippingLocation: (location) => set({ shippingLocation: location }),
+      getShippingCost: () => {
+        const state = get()
+        return state.shippingLocation === "inside-dhaka" ? 60 : 100
+      },
       clearCart: () => set({ items: [] }),
       getTotal: () => {
         const state = get()

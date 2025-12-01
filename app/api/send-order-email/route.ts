@@ -24,6 +24,7 @@ interface OrderEmailData {
   promoDiscount: number;
   appliedPromoCode?: string;
   shipping: number;
+  shippingLocation: string;
   total: number;
   paymentMethod: string;
   paymentNumber: string;
