@@ -15,6 +15,9 @@ export default function CartPage() {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const clearCart = useCartStore((state) => state.clearCart);
   const getTotal = useCartStore((state) => state.getTotal);
+  const shippingLocation = useCartStore((state) => state.shippingLocation);
+  const setShippingLocation = useCartStore((state) => state.setShippingLocation);
+  const getShippingCost = useCartStore((state) => state.getShippingCost);
   const appliedCode = usePromoStore((state) => state.appliedCode);
   const calculateDiscount = usePromoStore((state) => state.calculateDiscount);
 
@@ -26,7 +29,7 @@ export default function CartPage() {
 
   const subtotal = getTotal();
   const promoDiscount = calculateDiscount(subtotal);
-  const shipping = subtotal > 100 ? 0 : 10;
+  const shipping = getShippingCost();
   const total = subtotal - promoDiscount + shipping;
 
   return (
@@ -92,13 +95,45 @@ export default function CartPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span className="font-medium">
-                    {shipping === 0
-                      ? "Free"
-                      : `৳${shipping.toLocaleString("en-BD")}`}
-                  </span>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Shipping Cost</span>
+                    <span className="font-medium">
+                      ৳{shipping.toLocaleString("en-BD")}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-accent transition-colors">
+                      <input
+                        type="radio"
+                        name="shipping"
+                        value="inside-dhaka"
+                        checked={shippingLocation === "inside-dhaka"}
+                        onChange={(e) => setShippingLocation(e.target.value as any)}
+                        className="w-4 h-4 text-primary"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">Inside Dhaka</div>
+                        <div className="text-sm text-muted-foreground">৳60</div>
+                      </div>
+                    </label>
+
+                    <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-accent transition-colors">
+                      <input
+                        type="radio"
+                        name="shipping"
+                        value="outside-dhaka"
+                        checked={shippingLocation === "outside-dhaka"}
+                        onChange={(e) => setShippingLocation(e.target.value as any)}
+                        className="w-4 h-4 text-primary"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">Outside Dhaka</div>
+                        <div className="text-sm text-muted-foreground">৳100</div>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               </div>
 

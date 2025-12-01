@@ -12,6 +12,8 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false)
   const items = useCartStore((state) => state.items)
   const getTotal = useCartStore((state) => state.getTotal)
+  const getShippingCost = useCartStore((state) => state.getShippingCost)
+  const shippingLocation = useCartStore((state) => state.shippingLocation)
   const appliedCode = usePromoStore((state) => state.appliedCode)
   const calculateDiscount = usePromoStore((state) => state.calculateDiscount)
 
@@ -36,7 +38,7 @@ export default function CheckoutPage() {
 
   const subtotal = getTotal()
   const promoDiscount = calculateDiscount(subtotal)
-  const shipping = subtotal > 100 ? 0 : 10
+  const shipping = getShippingCost()
   const total = subtotal - promoDiscount + shipping
 
   return (
@@ -60,6 +62,7 @@ export default function CheckoutPage() {
             promoDiscount={promoDiscount}
             appliedPromoCode={appliedCode || undefined}
             shipping={shipping}
+            shippingLocation={shippingLocation}
           />
         </div>
 
@@ -92,8 +95,10 @@ export default function CheckoutPage() {
             )}
 
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
-              <span className="font-medium">{shipping === 0 ? "Free" : `৳${shipping.toLocaleString('en-BD')}`}</span>
+              <span className="text-muted-foreground">
+                Shipping ({shippingLocation === "inside-dhaka" ? "Inside Dhaka" : "Outside Dhaka"})
+              </span>
+              <span className="font-medium">৳{shipping.toLocaleString('en-BD')}</span>
             </div>
           </div>
 

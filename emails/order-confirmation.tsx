@@ -34,6 +34,7 @@ interface OrderConfirmationEmailProps {
   promoDiscount: number;
   appliedPromoCode?: string;
   shipping: number;
+  shippingLocation: string;
   total: number;
   paymentMethod: string;
   paymentNumber: string;
@@ -51,6 +52,7 @@ export const OrderConfirmationEmail = ({
   promoDiscount,
   appliedPromoCode,
   shipping,
+  shippingLocation,
   total,
   paymentMethod,
   paymentNumber,
@@ -174,13 +176,13 @@ export const OrderConfirmationEmail = ({
 
             <Row style={summaryRow}>
               <Column>
-                <Text style={summaryLabel}>Shipping:</Text>
+                <Text style={summaryLabel}>
+                  Shipping ({shippingLocation === "inside-dhaka" ? "Inside Dhaka" : "Outside Dhaka"}):
+                </Text>
               </Column>
               <Column align="right">
                 <Text style={summaryValue}>
-                  {shipping === 0
-                    ? "Free"
-                    : `৳${shipping.toLocaleString("en-BD")}`}
+                  ৳{shipping.toLocaleString("en-BD")}
                 </Text>
               </Column>
             </Row>

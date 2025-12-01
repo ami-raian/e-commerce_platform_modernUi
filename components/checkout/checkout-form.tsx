@@ -4,7 +4,11 @@ import type React from "react";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCartStore, type CartItem } from "@/lib/cart-store";
+import {
+  useCartStore,
+  type CartItem,
+  type ShippingLocation,
+} from "@/lib/cart-store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -16,6 +20,7 @@ interface CheckoutFormProps {
   promoDiscount: number;
   appliedPromoCode?: string;
   shipping: number;
+  shippingLocation: ShippingLocation;
 }
 
 export function CheckoutForm({
@@ -25,6 +30,7 @@ export function CheckoutForm({
   promoDiscount,
   appliedPromoCode,
   shipping,
+  shippingLocation,
 }: CheckoutFormProps) {
   const router = useRouter();
   const clearCart = useCartStore((state) => state.clearCart);
@@ -102,6 +108,7 @@ export function CheckoutForm({
           promoDiscount: promoDiscount,
           appliedPromoCode: appliedPromoCode,
           shipping: shipping,
+          shippingLocation: shippingLocation,
           total: total,
           paymentMethod: paymentMethod.name,
           paymentNumber: paymentMethod.number,
@@ -303,8 +310,8 @@ export function CheckoutForm({
               {sendingEmail
                 ? "Sending confirmation email..."
                 : orderPlaced
-                ? "Order Placed Successfully!"
-                : "Place Order"}
+                  ? "Order Placed Successfully!"
+                  : "Place Order"}
             </button>
 
             <div className="text-center text-sm text-muted-foreground">
@@ -314,7 +321,7 @@ export function CheckoutForm({
           </div>
         ) : (
           <div className="p-4 bg-accent rounded-lg border border-border text-center">
-            <p className="text-muted-foreground">
+            <p className="text-white">
               Please fill out all shipping information to proceed with payment
             </p>
           </div>
