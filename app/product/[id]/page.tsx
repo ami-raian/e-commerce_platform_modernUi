@@ -361,7 +361,7 @@ export default function ProductPage({
                 {promoMessage}
               </p>
             )}
-            <div className="pt-2 space-y-1">
+            {/* <div className="pt-2 space-y-1">
               <p className="text-xs text-muted-foreground">
                 Available promo codes:
               </p>
@@ -379,7 +379,7 @@ export default function ProductPage({
                   WELCOME20
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Add to Cart Button */}
