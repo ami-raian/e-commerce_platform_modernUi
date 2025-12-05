@@ -99,21 +99,24 @@ export default function HomePage() {
             className={`absolute inset-0 bg-linear-to-br ${heroSlides[currentSlide].gradient}`}
           /> */}
 
+          {/* <div className="absolute inset-0 bg-grid-pattern opacity-10"></div> */}
+
           {/* Optional: Add pattern overlay */}
+          <div className="absolute inset-0 bg-black/50"></div>
           <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
 
           {/* Content */}
           <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
             <div className="space-y-4 md:space-y-6 lg:space-y-8 animate-fade-in max-w-5xl">
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white tracking-wider leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white/80 tracking-wider leading-tight">
                 {heroSlides[currentSlide].title}
               </h1>
-              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 font-light">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/80 font-light">
                 {heroSlides[currentSlide].subtitle}
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-white text-primary rounded-lg font-semibold text-sm md:text-base lg:text-lg hover:bg-white/90 transition-all hover:scale-105 shadow-lg"
+                className="inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-white/80 text-primary rounded-lg font-semibold text-sm md:text-base lg:text-lg hover:bg-white/90 transition-all hover:scale-105 shadow-lg"
               >
                 <span className="hidden sm:inline">LOOK OUR PRODUCTS</span>
                 <span className="sm:hidden">SHOP NOW</span>
