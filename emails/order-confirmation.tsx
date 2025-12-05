@@ -209,19 +209,36 @@ export const OrderConfirmationEmail = ({
             <Text style={infoText}>
               <strong>Payment Method:</strong> {paymentMethod}
             </Text>
-            <Text style={infoText}>
-              <strong>Send Payment To:</strong> {paymentNumber}
-            </Text>
-            <Text style={infoText}>
-              <strong>Amount to Send:</strong> ৳{total.toLocaleString("en-BD")}
-            </Text>
-            <Section style={paymentInstructions}>
-              <Text style={instructionText}>
-                Please complete your payment using {paymentMethod} to the number
-                above. Once payment is confirmed, we'll process your order
-                immediately.
-              </Text>
-            </Section>
+            {paymentNumber ? (
+              <>
+                <Text style={infoText}>
+                  <strong>Send Payment To:</strong> {paymentNumber}
+                </Text>
+                <Text style={infoText}>
+                  <strong>Amount to Send:</strong> ৳{total.toLocaleString("en-BD")}
+                </Text>
+                <Section style={paymentInstructions}>
+                  <Text style={instructionText}>
+                    Please complete your payment using {paymentMethod} to the number
+                    above. Once payment is confirmed, we'll process your order
+                    immediately.
+                  </Text>
+                </Section>
+              </>
+            ) : (
+              <>
+                <Text style={infoText}>
+                  <strong>Amount to Pay:</strong> ৳{total.toLocaleString("en-BD")}
+                </Text>
+                <Section style={paymentInstructions}>
+                  <Text style={instructionText}>
+                    You've selected Cash on Delivery. Please prepare the exact amount
+                    and pay the delivery person when you receive your order. Make sure
+                    to check the product before making the payment.
+                  </Text>
+                </Section>
+              </>
+            )}
           </Section>
 
           <Hr style={divider} />
