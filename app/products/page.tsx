@@ -34,15 +34,10 @@ function ProductsContent() {
   const [selectedSubCategory, setSelectedSubCategory] = useState(
     searchParams.get("subCategory") || "all"
   );
-  const [priceRange, setPriceRange] = useState({
-    min: 0,
-    max: 10000,
-  });
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     category: true,
     subCategory: true,
-    price: true,
     sort: true,
   });
 
@@ -77,32 +72,40 @@ function ProductsContent() {
     });
   };
 
-  // Fetch products on mount and when filters or page change
+  // Fetch products on mount and when URL params change
   useEffect(() => {
     const pageFromUrl = parseInt(searchParams.get("page") || "1");
+    const categoryFromUrl = searchParams.get("category") || "all";
+    const subCategoryFromUrl = searchParams.get("subcategory") || "all";
+    const sortFromUrl = searchParams.get("sort") || "popularity";
+
+    // Update local state to match URL
     setCurrentPage(pageFromUrl);
+    setSelectedCategory(categoryFromUrl);
+    setSelectedSubCategory(subCategoryFromUrl);
+    setSortBy(sortFromUrl);
 
     const filters = {
       page: pageFromUrl,
       limit: 12,
-      category: selectedCategory !== "all" ? selectedCategory : undefined,
+      category: categoryFromUrl !== "all" ? categoryFromUrl : undefined,
       subCategory:
-        selectedSubCategory !== "all"
-          ? (selectedSubCategory as "gents" | "ladies")
+        subCategoryFromUrl !== "all"
+          ? (subCategoryFromUrl as "gents" | "ladies")
           : undefined,
-      sort: sortBy !== "popularity"
-        ? (sortBy as "price-asc" | "price-desc" | "newest" | "rating" | "popularity")
-        : undefined,
+      sort:
+        sortFromUrl !== "popularity"
+          ? (sortFromUrl as
+              | "price-asc"
+              | "price-desc"
+              | "newest"
+              | "rating"
+              | "popularity")
+          : undefined,
     };
 
     fetchProducts(filters);
-  }, [
-    fetchProducts,
-    searchParams,
-    selectedCategory,
-    selectedSubCategory,
-    sortBy,
-  ]);
+  }, [searchParams, fetchProducts]);
 
   // Page change handler
   const handlePageChange = (page: number) => {
@@ -142,7 +145,6 @@ function ProductsContent() {
     setSelectedCategory("all");
     setSelectedSubCategory("all");
     setSortBy("popularity");
-    setPriceRange({ min: 0, max: 10000 });
     setCurrentPage(1);
     router.push("/products", { scroll: false });
   };
@@ -172,18 +174,10 @@ function ProductsContent() {
     { value: "newest", label: "Newest Arrivals" },
   ];
 
-  const priceRanges = [
-    { min: 0, max: 1000, label: "Under ৳1,000" },
-    { min: 1000, max: 3000, label: "৳1,000 - ৳3,000" },
-    { min: 3000, max: 5000, label: "৳3,000 - ৳5,000" },
-    { min: 5000, max: 10000, label: "Above ৳5,000" },
-  ];
-
   const activeFiltersCount =
     (selectedCategory !== "all" ? 1 : 0) +
     (selectedSubCategory !== "all" ? 1 : 0) +
-    (sortBy !== "popularity" ? 1 : 0) +
-    (priceRange.min !== 0 || priceRange.max !== 10000 ? 1 : 0);
+    (sortBy !== "popularity" ? 1 : 0);
 
   // Filter sidebar component
   const FilterSidebar = () => (
@@ -280,42 +274,6 @@ function ProductsContent() {
           )}
         </Card>
       )}
-
-      {/* Price Range Filter */}
-      <Card>
-        <CardHeader className="py-4">
-          <button
-            onClick={() => toggleSection("price")}
-            className="flex items-center justify-between w-full"
-          >
-            <CardTitle className="text-base">Price Range</CardTitle>
-            {expandedSections.price ? (
-              <ChevronUp size={16} />
-            ) : (
-              <ChevronDown size={16} />
-            )}
-          </button>
-        </CardHeader>
-        {expandedSections.price && (
-          <CardContent className="space-y-2 pb-4">
-            {priceRanges.map((range) => (
-              <button
-                key={`${range.min}-${range.max}`}
-                onClick={() =>
-                  setPriceRange({ min: range.min, max: range.max })
-                }
-                className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
-                  priceRange.min === range.min && priceRange.max === range.max
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                }`}
-              >
-                <span className="font-medium">{range.label}</span>
-              </button>
-            ))}
-          </CardContent>
-        )}
-      </Card>
 
       {/* Sort Options */}
       <Card>
@@ -435,7 +393,10 @@ function ProductsContent() {
                   </span>{" "}
                   -{" "}
                   <span className="font-semibold text-foreground">
-                    {Math.min(pagination.page * pagination.limit, pagination.total)}
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    )}
                   </span>{" "}
                   of{" "}
                   <span className="font-semibold text-foreground">
@@ -517,7 +478,8 @@ function ProductsContent() {
                       {Array.from({ length: pagination.pages }, (_, i) => i + 1)
                         .filter((page) => {
                           // Show first page, last page, current page, and pages around current
-                          if (page === 1 || page === pagination.pages) return true;
+                          if (page === 1 || page === pagination.pages)
+                            return true;
                           if (Math.abs(page - currentPage) <= 1) return true;
                           return false;
                         })

@@ -67,18 +67,19 @@ export const useProductStore = create<ProductStore>()((set, get) => ({
 
   // Fetch all products with filters
   fetchProducts: async (filters) => {
-    set({ loading: true, error: null });
+    set({ loading: true, error: null, products: [] });
     try {
       const data = await getProductsAxios(filters);
       set({
         products: data.products,
         pagination: data.pagination,
-        loading: false
+        loading: false,
       });
     } catch (error: any) {
       set({
         error: error.message || "Failed to fetch products",
         loading: false,
+        products: [],
       });
     }
   },
