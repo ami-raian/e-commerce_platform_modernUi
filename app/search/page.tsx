@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useProductStore } from "@/lib/product-store";
 import { ProductCard } from "@/components/products/product-card";
+import { getImageUrl } from "@/lib/api";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
@@ -72,8 +73,10 @@ function SearchContent() {
                   <ProductCard
                     id={product._id}
                     name={product.name}
+                    mainPrice={product.mainPrice}
                     price={product.price}
-                    image={product.image}
+                    discountPercent={product.discountPercent}
+                    image={getImageUrl(product.images?.[0] || product.image)}
                     category={product.category}
                     rating={product.rating}
                   />
@@ -110,7 +113,13 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background py-12"><div className="container-xl">Loading...</div></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background py-12">
+          <div className="container-xl">Loading...</div>
+        </div>
+      }
+    >
       <SearchContent />
     </Suspense>
   );
