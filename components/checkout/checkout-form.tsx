@@ -34,6 +34,7 @@ export function CheckoutForm({
 }: CheckoutFormProps) {
   const router = useRouter();
   const clearCart = useCartStore((state) => state.clearCart);
+  const setDirectPurchaseItem = useCartStore((state) => state.setDirectPurchaseItem);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -142,6 +143,7 @@ export function CheckoutForm({
       setSendingEmail(false);
       setTimeout(() => {
         clearCart();
+        setDirectPurchaseItem(null);
         router.push("/");
       }, 2000);
     }

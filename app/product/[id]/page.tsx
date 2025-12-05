@@ -2,7 +2,8 @@
 
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Star, ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Star, ShoppingCart, Zap } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useProductStore, type Product } from "@/lib/product-store";
 import Image from "next/image";
@@ -15,7 +16,8 @@ export default function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { products, loading, fetchProductById } = useProductStore();
+  const router = useRouter();
+  const { loading, fetchProductById } = useProductStore();
 
   const [product, setProduct] = useState<Product | null>(null);
 
@@ -38,6 +40,7 @@ export default function ProductPage({
   const [promoMessage, setPromoMessage] = useState("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const addItem = useCartStore((state) => state.addItem);
+  const setDirectPurchaseItem = useCartStore((state) => state.setDirectPurchaseItem);
 
   const promoCodes: { [key: string]: number } = {
     SAVE5: 5,
@@ -127,6 +130,37 @@ export default function ProductPage({
 
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    // Validate size selection if product has sizes
+    if (product.sizes.length > 0 && !selectedSize) {
+      toast.error("Please select a size before purchasing");
+      return;
+    }
+
+    // Set as direct purchase item (not added to cart)
+    const purchaseItem = {
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      quantity,
+      image:
+        product.images?.[0] ?? (product as any).image ?? "/placeholder.svg",
+      size: selectedSize || undefined,
+    };
+
+    setDirectPurchaseItem(purchaseItem);
+
+    // Show toast
+    toast.success("Redirecting to checkout...", {
+      duration: 1500,
+    });
+
+    // Redirect to checkout
+    setTimeout(() => {
+      router.push("/checkout");
+    }, 500);
   };
 
   return (
@@ -382,8 +416,15 @@ export default function ProductPage({
             </div> */}
           </div>
 
-          {/* Add to Cart Button */}
-          <div className="space-y-8">
+          {/* Action Buttons */}
+          <div className="space-y-4">
+            <button
+              onClick={handleBuyNow}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-4 text-lg flex items-center justify-center gap-2 rounded-lg transition-colors"
+            >
+              <Zap size={24} />
+              Buy Now
+            </button>
             <button
               onClick={handleAddToCart}
               className="w-full btn-primary py-4 text-lg flex items-center justify-center gap-2"

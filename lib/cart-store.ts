@@ -15,10 +15,12 @@ export type ShippingLocation = "inside-dhaka" | "outside-dhaka"
 interface CartStore {
   items: CartItem[]
   shippingLocation: ShippingLocation
+  directPurchaseItem: CartItem | null
   addItem: (item: CartItem) => void
   removeItem: (productId: string, size?: string) => void
   updateQuantity: (productId: string, size: string | undefined, quantity: number) => void
   setShippingLocation: (location: ShippingLocation) => void
+  setDirectPurchaseItem: (item: CartItem | null) => void
   getShippingCost: () => number
   clearCart: () => void
   getTotal: () => number
@@ -30,6 +32,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       shippingLocation: "inside-dhaka",
+      directPurchaseItem: null,
       addItem: (item) =>
         set((state) => {
           const existingItem = state.items.find(
@@ -57,11 +60,12 @@ export const useCartStore = create<CartStore>()(
           ),
         })),
       setShippingLocation: (location) => set({ shippingLocation: location }),
+      setDirectPurchaseItem: (item) => set({ directPurchaseItem: item }),
       getShippingCost: () => {
         const state = get()
         return state.shippingLocation === "inside-dhaka" ? 60 : 100
       },
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], directPurchaseItem: null }),
       getTotal: () => {
         const state = get()
         return state.items.reduce((total, item) => total + item.price * item.quantity, 0)
