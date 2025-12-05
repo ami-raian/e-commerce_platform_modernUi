@@ -95,9 +95,9 @@ export default function HomePage() {
           />
 
           {/* Gradient Overlay */}
-          <div
+          {/* <div
             className={`absolute inset-0 bg-linear-to-br ${heroSlides[currentSlide].gradient}`}
-          />
+          /> */}
 
           {/* Optional: Add pattern overlay */}
           <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
