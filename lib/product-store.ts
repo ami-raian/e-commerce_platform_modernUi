@@ -73,7 +73,7 @@ export const useProductStore = create<ProductStore>()((set, get) => ({
       set({
         products: data.products,
         pagination: data.pagination,
-        loading: false
+        loading: false,
       });
     } catch (error: any) {
       set({
