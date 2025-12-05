@@ -11,9 +11,11 @@ import { PromoInput } from "@/components/promo/promo-input"
 export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false)
   const items = useCartStore((state) => state.items)
+  const directPurchaseItem = useCartStore((state) => state.directPurchaseItem)
   const getTotal = useCartStore((state) => state.getTotal)
   const getShippingCost = useCartStore((state) => state.getShippingCost)
   const shippingLocation = useCartStore((state) => state.shippingLocation)
+  const setShippingLocation = useCartStore((state) => state.setShippingLocation)
   const appliedCode = usePromoStore((state) => state.appliedCode)
   const calculateDiscount = usePromoStore((state) => state.calculateDiscount)
 
@@ -23,7 +25,10 @@ export default function CheckoutPage() {
 
   if (!mounted) return null
 
-  if (items.length === 0) {
+  // Use direct purchase item if available, otherwise use cart items
+  const checkoutItems = directPurchaseItem ? [directPurchaseItem] : items
+
+  if (checkoutItems.length === 0) {
     return (
       <div className="container-xl py-8">
         <div className="text-center py-16">
@@ -36,7 +41,8 @@ export default function CheckoutPage() {
     )
   }
 
-  const subtotal = getTotal()
+  // Calculate subtotal from checkout items
+  const subtotal = checkoutItems.reduce((total, item) => total + item.price * item.quantity, 0)
   const promoDiscount = calculateDiscount(subtotal)
   const shipping = getShippingCost()
   const total = subtotal - promoDiscount + shipping
@@ -54,10 +60,46 @@ export default function CheckoutPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
+          {/* Shipping Location Selector */}
+          <div className="card">
+            <h3 className="text-lg font-semibold mb-4">Select Shipping Location</h3>
+            <div className="space-y-2">
+              <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-accent transition-colors">
+                <input
+                  type="radio"
+                  name="checkout-shipping"
+                  value="inside-dhaka"
+                  checked={shippingLocation === "inside-dhaka"}
+                  onChange={(e) => setShippingLocation(e.target.value as any)}
+                  className="w-4 h-4 text-primary"
+                />
+                <div className="flex-1">
+                  <div className="font-medium">Inside Dhaka</div>
+                  <div className="text-sm text-muted-foreground">৳60</div>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-accent transition-colors">
+                <input
+                  type="radio"
+                  name="checkout-shipping"
+                  value="outside-dhaka"
+                  checked={shippingLocation === "outside-dhaka"}
+                  onChange={(e) => setShippingLocation(e.target.value as any)}
+                  className="w-4 h-4 text-primary"
+                />
+                <div className="flex-1">
+                  <div className="font-medium">Outside Dhaka</div>
+                  <div className="text-sm text-muted-foreground">৳100</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
           <PromoInput />
           <CheckoutForm
             total={total}
-            cartItems={items}
+            cartItems={checkoutItems}
             subtotal={subtotal}
             promoDiscount={promoDiscount}
             appliedPromoCode={appliedCode || undefined}
@@ -71,10 +113,10 @@ export default function CheckoutPage() {
           <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
 
           <div className="space-y-3 mb-6 pb-6 border-b border-border max-h-48 overflow-y-auto">
-            {items.map((item) => (
-              <div key={item.productId} className="flex justify-between">
+            {checkoutItems.map((item) => (
+              <div key={`${item.productId}-${item.size || 'no-size'}`} className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {item.name} x{item.quantity}
+                  {item.name}{item.size ? ` (${item.size})` : ''} x{item.quantity}
                 </span>
                 <span className="font-medium">৳{(item.price * item.quantity).toLocaleString('en-BD')}</span>
               </div>
