@@ -72,22 +72,30 @@ function ProductsContent() {
     });
   };
 
-  // Fetch products on mount and when filters or page change
+  // Fetch products on mount and when URL params change
   useEffect(() => {
     const pageFromUrl = parseInt(searchParams.get("page") || "1");
+    const categoryFromUrl = searchParams.get("category") || "all";
+    const subCategoryFromUrl = searchParams.get("subcategory") || "all";
+    const sortFromUrl = searchParams.get("sort") || "popularity";
+
+    // Update local state to match URL
     setCurrentPage(pageFromUrl);
+    setSelectedCategory(categoryFromUrl);
+    setSelectedSubCategory(subCategoryFromUrl);
+    setSortBy(sortFromUrl);
 
     const filters = {
       page: pageFromUrl,
       limit: 12,
-      category: selectedCategory !== "all" ? selectedCategory : undefined,
+      category: categoryFromUrl !== "all" ? categoryFromUrl : undefined,
       subCategory:
-        selectedSubCategory !== "all"
-          ? (selectedSubCategory as "gents" | "ladies")
+        subCategoryFromUrl !== "all"
+          ? (subCategoryFromUrl as "gents" | "ladies")
           : undefined,
       sort:
-        sortBy !== "popularity"
-          ? (sortBy as
+        sortFromUrl !== "popularity"
+          ? (sortFromUrl as
               | "price-asc"
               | "price-desc"
               | "newest"
@@ -97,13 +105,7 @@ function ProductsContent() {
     };
 
     fetchProducts(filters);
-  }, [
-    fetchProducts,
-    searchParams,
-    selectedCategory,
-    selectedSubCategory,
-    sortBy,
-  ]);
+  }, [searchParams, fetchProducts]);
 
   // Page change handler
   const handlePageChange = (page: number) => {
