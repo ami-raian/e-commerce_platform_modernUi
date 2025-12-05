@@ -34,7 +34,9 @@ export function CheckoutForm({
 }: CheckoutFormProps) {
   const router = useRouter();
   const clearCart = useCartStore((state) => state.clearCart);
-  const setDirectPurchaseItem = useCartStore((state) => state.setDirectPurchaseItem);
+  const setDirectPurchaseItem = useCartStore(
+    (state) => state.setDirectPurchaseItem
+  );
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -66,11 +68,35 @@ export function CheckoutForm({
 
   const customerName = `${formData.firstName} ${formData.lastName}`;
 
-  const mobileMoneyOptions = [
-    { id: "bkash", name: "bKash", number: "01712-345678", logo: "💳" },
-    { id: "nagad", name: "Nagad", number: "01812-345678", logo: "💰" },
-    { id: "rocket", name: "Rocket", number: "01912-345678", logo: "🚀" },
-    // { id: "sendmoney", name: "Send Money", number: "01612-345678", logo: "📱" },
+  const paymentOptions = [
+    {
+      id: "bkash",
+      name: "bKash",
+      number: "01712-345678",
+      logo: "💳",
+      type: "mobile-money",
+    },
+    {
+      id: "nagad",
+      name: "Nagad",
+      number: "01812-345678",
+      logo: "💰",
+      type: "mobile-money",
+    },
+    {
+      id: "rocket",
+      name: "Rocket",
+      number: "01912-345678",
+      logo: "🚀",
+      type: "mobile-money",
+    },
+    {
+      id: "cod",
+      name: "Cash on Delivery",
+      number: "",
+      logo: "💵",
+      type: "cod",
+    },
   ];
 
   const handlePlaceOrder = async () => {
@@ -79,7 +105,7 @@ export function CheckoutForm({
       return;
     }
 
-    const paymentMethod = mobileMoneyOptions.find(
+    const paymentMethod = paymentOptions.find(
       (opt) => opt.id === selectedPayment
     );
 
@@ -124,14 +150,26 @@ export function CheckoutForm({
           { duration: 5000 }
         );
       } else {
-        toast.success(
-          `Order placed successfully! Check your email for confirmation. Please send ৳${total.toLocaleString(
-            "en-BD"
-          )} to ${paymentMethod.name}: ${paymentMethod.number}`,
-          {
-            duration: 6000,
-          }
-        );
+        // Different success messages for COD vs mobile money
+        if (paymentMethod.type === "cod") {
+          toast.success(
+            `Order placed successfully! Check your email for confirmation. Pay ৳${total.toLocaleString(
+              "en-BD"
+            )} when you receive your order.`,
+            {
+              duration: 6000,
+            }
+          );
+        } else {
+          toast.success(
+            `Order placed successfully! Check your email for confirmation. Please send ৳${total.toLocaleString(
+              "en-BD"
+            )} to ${paymentMethod.name}: ${paymentMethod.number}`,
+            {
+              duration: 6000,
+            }
+          );
+        }
       }
     } catch (error) {
       console.error("Error sending email:", error);
@@ -238,11 +276,11 @@ export function CheckoutForm({
         {isFormValid ? (
           <div className="space-y-6">
             <p className="text-muted-foreground">
-              Select your preferred mobile money service to complete payment
+              Select your preferred payment method to complete your order
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mobileMoneyOptions.map((option) => (
+              {paymentOptions.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => setSelectedPayment(option.id)}
@@ -256,12 +294,20 @@ export function CheckoutForm({
                     <span className="text-4xl">{option.logo}</span>
                     <div className="text-left">
                       <p className="font-bold text-lg">{option.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Send Money to:
-                      </p>
-                      <p className="font-mono font-semibold text-primary">
-                        {option.number}
-                      </p>
+                      {option.type === "mobile-money" ? (
+                        <>
+                          <p className="text-sm text-muted-foreground">
+                            Send Money to:
+                          </p>
+                          <p className="font-mono font-semibold text-primary">
+                            {option.number}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Pay when you receive
+                        </p>
+                      )}
                     </div>
                   </div>
                 </button>
@@ -271,36 +317,59 @@ export function CheckoutForm({
             {selectedPayment && (
               <div className="bg-accent/50 border border-primary/20 rounded-lg p-6 space-y-3">
                 <h4 className="font-semibold text-lg">Payment Instructions:</h4>
-                <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    Select{" "}
-                    {
-                      mobileMoneyOptions.find(
-                        (opt) => opt.id === selectedPayment
-                      )?.name
-                    }{" "}
-                    from your mobile
-                  </li>
-                  <li>Choose "Send Money" option</li>
-                  <li>
-                    Enter the number:{" "}
-                    <span className="font-mono font-bold text-foreground">
+                {paymentOptions.find((opt) => opt.id === selectedPayment)
+                  ?.type === "cod" ? (
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p className="font-medium text-foreground">
+                      You've selected Cash on Delivery
+                    </p>
+                    <ul className="list-disc list-inside space-y-2">
+                      <li>
+                        Click "Place Order" button below to confirm your order
+                      </li>
+                      <li>
+                        Prepare exact amount:{" "}
+                        <span className="font-bold text-foreground">
+                          ৳{total.toLocaleString("en-BD")}
+                        </span>
+                      </li>
+                      <li>
+                        Pay the delivery person when you receive your order
+                      </li>
+                      <li>Make sure to check the product before payment</li>
+                    </ul>
+                  </div>
+                ) : (
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                    <li>
+                      Select{" "}
                       {
-                        mobileMoneyOptions.find(
-                          (opt) => opt.id === selectedPayment
-                        )?.number
-                      }
-                    </span>
-                  </li>
-                  <li>
-                    Enter amount:{" "}
-                    <span className="font-bold text-foreground">
-                      ৳{total.toLocaleString("en-BD")}
-                    </span>
-                  </li>
-                  <li>Complete the transaction</li>
-                  <li>Click "Place Order" button below</li>
-                </ol>
+                        paymentOptions.find((opt) => opt.id === selectedPayment)
+                          ?.name
+                      }{" "}
+                      from your mobile
+                    </li>
+                    <li>Choose "Send Money" option</li>
+                    <li>
+                      Enter the number:{" "}
+                      <span className="font-mono font-bold text-foreground">
+                        {
+                          paymentOptions.find(
+                            (opt) => opt.id === selectedPayment
+                          )?.number
+                        }
+                      </span>
+                    </li>
+                    <li>
+                      Enter amount:{" "}
+                      <span className="font-bold text-foreground">
+                        ৳{total.toLocaleString("en-BD")}
+                      </span>
+                    </li>
+                    <li>Complete the transaction</li>
+                    <li>Click "Place Order" button below</li>
+                  </ol>
+                )}
               </div>
             )}
 
@@ -317,8 +386,7 @@ export function CheckoutForm({
             </button>
 
             <div className="text-center text-sm text-muted-foreground">
-              <p>We also accept Cash on Delivery (COD)</p>
-              <p>Customer support: 01712-XXXXXX</p>
+              <p>Having trouble? Contact customer support: +880 1650-278889</p>
             </div>
           </div>
         ) : (
