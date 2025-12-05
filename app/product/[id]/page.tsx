@@ -40,7 +40,9 @@ export default function ProductPage({
   const [promoMessage, setPromoMessage] = useState("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const addItem = useCartStore((state) => state.addItem);
-  const setDirectPurchaseItem = useCartStore((state) => state.setDirectPurchaseItem);
+  const setDirectPurchaseItem = useCartStore(
+    (state) => state.setDirectPurchaseItem
+  );
 
   const promoCodes: { [key: string]: number } = {
     SAVE5: 5,
@@ -432,17 +434,19 @@ export default function ProductPage({
               <ShoppingCart size={24} />
               Add to Cart
             </button>
-            {addedToCart && (
+            {/* {addedToCart && (
               <p className="text-center text-green-600 font-medium">
                 Added to cart!
               </p>
-            )}
-            <Link
-              href="/products"
-              className="w-full btn-secondary text-center py-4"
-            >
-              Continue Shopping
-            </Link>
+            )} */}
+            <div className="py-4">
+              <Link
+                href="/products"
+                className="w-full btn-secondary text-center"
+              >
+                Continue Shopping
+              </Link>
+            </div>
           </div>
 
           {/* Product Details */}
